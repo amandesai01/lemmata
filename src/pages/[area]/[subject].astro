@@ -28,6 +28,9 @@ const sections = headings.filter((h) => h.depth === 2);
 const areaName = catalog.find((s) => s.id === area)!.name;
 const Figure = figures[figure];
 const statements = listStatements(note.body ?? '', note.id);
+// Whether the note has videos and questions: where it has none, the control that opens them is left off.
+const hasVideos = /<Video\b/.test(note.body ?? '');
+const hasQuestions = /<Question\b/.test(note.body ?? '');
 // Where the section number changes (1.4 → 2.1), the list leaves a little space.
 const opensSection = (i: number) => i > 0 && statements[i].n.split('.')[0] !== statements[i - 1].n.split('.')[0];
 ---
@@ -49,6 +52,26 @@ const opensSection = (i: number) => i > 0 && statements[i].n.split('.')[0] !== s
     </header>
 
     <nav class="contents" aria-labelledby="contents-heading">
+      {(hasVideos || hasQuestions) && (
+        <p class="contents-actions">
+          {hasVideos && (
+            <button type="button" class="questions-solve" data-watch-all aria-haspopup="dialog">
+              <svg class="questions-solve-mark contents-play" viewBox="0 0 12 12" aria-hidden="true">
+                <polygon points="1.5,1 11,6 1.5,11" />
+              </svg>
+              <span class="cap-text">Watch all videos</span>
+            </button>
+          )}
+          {hasQuestions && (
+            <button type="button" class="questions-solve" data-solve-all aria-haspopup="dialog">
+              <svg class="questions-solve-mark" viewBox="0 0 12 12" aria-hidden="true">
+                <path d="M1 4.5V1h3.5M7.5 1H11v3.5M11 7.5V11H7.5M4.5 11H1V7.5" />
+              </svg>
+              <span class="cap-text">Solve all questions</span>
+            </button>
+          )}
+        </p>
+      )}
       <h2 id="contents-heading">Contents</h2>
       <ol>
         {sections.map((s, i) => (
@@ -198,7 +221,18 @@ const opensSection = (i: number) => i > 0 && statements[i].n.split('.')[0] !== s
   .facts a { text-decoration-color: var(--ink-3); }
   .facts a:hover { color: var(--red); text-decoration-color: var(--red); }
 
-  /* Contents */
+  /* Contents, and above them the controls that open the page's videos and every question on it. */
+
+  .contents-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: 0.85rem;
+    margin-bottom: 1.75rem;
+  }
+
+  /* The play mark is filled, as the video cards' is; the other marks are drawn in line. */
+  .contents-play { fill: currentColor; stroke: none; }
 
   .contents h2 {
     font-weight: 400;

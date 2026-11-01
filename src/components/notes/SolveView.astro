@@ -1,6 +1,7 @@
 ---
-// Solving a section's questions without distraction. The SOLVE control on a <Questions> card opens a
-// plain page over the notes, one question at a time. "Check your solution" opens a sheet that walks
+// Solving questions without distraction. The SOLVE control on a <Questions> card opens a plain page
+// over the notes with that section's questions, one at a time; the control above the contents opens
+// every question on the page, with a rail of the sections to their left. "Check your solution" opens a sheet that walks
 // the reader through having an AI assistant check a photo of their written work: it copies a prompt
 // holding the question, the statements it cites and the question's answer-ctx, so the assistant
 // needs nothing else.
@@ -16,6 +17,7 @@
       <button type="button" class="solve-label solve-close" data-solve-close>Close</button>
     </header>
 
+    <div class="solve-body">
     <div class="solve-main">
       <div class="solve-question" data-solve-question>
         <span class="solve-n" data-solve-n></span>
@@ -30,7 +32,13 @@
       </button>
     </div>
 
-    <nav class="solve-nav" aria-label="Questions in this section">
+    <nav class="solve-sections" aria-labelledby="solve-sections-heading">
+      <h3 id="solve-sections-heading" class="solve-sections-head">Sections</h3>
+      <ol class="solve-sections-list" data-solve-sections></ol>
+    </nav>
+    </div>
+
+    <nav class="solve-nav" aria-label="Questions in this section" data-solve-foot>
       <button type="button" class="solve-label solve-step" data-solve-prev>
         <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M7.5 2 3.5 6l4 4" /></svg>
         <span class="cap-text">Previous</span>
@@ -109,51 +117,110 @@
 
   const still = matchMedia('(prefers-reduced-motion: reduce)');
 
+  interface Section {
+    n: string;
+    title: string;
+  }
+
   interface Question {
     n: string;
     item: HTMLLIElement;
+    section: Section;
   }
 
-  let section = { n: '', title: '' };
+  const sectionsList = $<HTMLOListElement>(solve, 'data-solve-sections');
+  const foot = $<HTMLElement>(solve, 'data-solve-foot');
+
   let questions: Question[] = [];
   let at = 0;
+  let shown: Section | null = null;
   let prompt = '';
 
   // ——— Opening the solving view ———
 
   document.addEventListener('click', (e) => {
-    const control = (e.target as Element).closest('[data-solve]');
-    const card = control?.closest<HTMLElement>('.questions');
-    if (card) open(card);
+    const target = e.target as Element;
+    if (target.closest('[data-solve-all]')) {
+      open([...document.querySelectorAll<HTMLElement>('.questions')].filter((card) => !solve.contains(card)), true);
+      return;
+    }
+    const card = target.closest('[data-solve]')?.closest<HTMLElement>('.questions');
+    if (card) open([card], false);
   });
 
-  function open(card: HTMLElement) {
-    // The section is the nearest heading before the card; its numeral is its place among the headings.
+  // A card's section is the nearest heading before it; its numeral is its place among the headings.
+  function sectionOf(card: HTMLElement): Section {
     let heading = card.previousElementSibling;
     while (heading && heading.tagName !== 'H2') heading = heading.previousElementSibling;
     const headings = [...(card.parentElement?.querySelectorAll(':scope > h2') ?? [])];
-    section = { n: String(headings.indexOf(heading!) + 1), title: heading?.textContent?.trim() ?? '' };
-    sectionN.textContent = section.n;
-    sectionTitle.textContent = section.title;
+    return { n: String(headings.indexOf(heading!) + 1), title: heading?.textContent?.trim() ?? '' };
+  }
 
-    const items = [...card.querySelectorAll<HTMLLIElement>(':scope > ol > li.question')];
-    questions = items.map((item, i) => ({ n: `${section.n}.${i + 1}`, item }));
+  const numeralButton = (q: Question, i: number) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = q.n;
+    b.dataset.q = String(i);
+    b.setAttribute('aria-label', `Question ${q.n}`);
+    b.addEventListener('click', () => show(i));
+    return b;
+  };
 
-    list.replaceChildren(
-      ...questions.map((q, i) => {
+  function open(cards: HTMLElement[], all: boolean) {
+    questions = cards.flatMap((card) => {
+      const section = sectionOf(card);
+      const items = [...card.querySelectorAll<HTMLLIElement>(':scope > ol > li.question')];
+      return items.map((item, i) => ({ n: `${section.n}.${i + 1}`, item, section }));
+    });
+    if (!questions.length) return;
+
+    solve.toggleAttribute('data-all', all);
+    foot.setAttribute('aria-label', all ? 'Questions in the current section' : 'Questions in this section');
+
+    // The rail: each section, which opens at its first question, and the numerals of its questions.
+    const sections = [...new Set(questions.map((q) => q.section))];
+    sectionsList.replaceChildren(
+      ...(all ? sections : []).map((section) => {
         const li = document.createElement('li');
-        const b = document.createElement('button');
-        b.type = 'button';
-        b.textContent = q.n;
-        b.setAttribute('aria-label', `Question ${q.n}`);
-        b.addEventListener('click', () => show(i));
-        li.append(b);
+        li.className = 'solve-sec';
+        const first = questions.findIndex((q) => q.section === section);
+        const head = document.createElement('button');
+        head.type = 'button';
+        head.className = 'solve-sec-head';
+        const n = document.createElement('span');
+        n.className = 'solve-sec-n';
+        n.textContent = section.n;
+        const title = document.createElement('span');
+        title.textContent = section.title;
+        head.append(n, title);
+        head.addEventListener('click', () => show(first));
+        const ol = document.createElement('ol');
+        questions.forEach((q, i) => {
+          if (q.section !== section) return;
+          const item = document.createElement('li');
+          item.append(numeralButton(q, i));
+          ol.append(item);
+        });
+        li.append(head, ol);
         return li;
       }),
     );
 
+    shown = null;
     show(0, false);
     solve.showModal();
+    revealSection();
+  }
+
+  // Entering a section that is not wholly in sight, the rail scrolls to bring its title to the top.
+  function revealSection() {
+    const sec = sectionsList.querySelector<HTMLElement>('.solve-sec.is-current');
+    if (!sec) return;
+    const list = sectionsList.getBoundingClientRect();
+    const box = sec.getBoundingClientRect();
+    if (box.top >= list.top && box.bottom <= list.bottom) return;
+    const pad = parseFloat(getComputedStyle(sectionsList).paddingTop);
+    sectionsList.scrollTo({ top: sectionsList.scrollTop + box.top - list.top - pad, behavior: still.matches ? 'auto' : 'smooth' });
   }
 
   let turn = 0;
@@ -163,9 +230,27 @@
     at = i;
     const q = questions[i];
 
-    // The controls answer at once; the question itself is changed over in show's own time.
-    list.querySelectorAll('button').forEach((b, j) => {
-      if (j === i) b.setAttribute('aria-current', 'step');
+    // The controls answer at once; the question itself is changed over in show's own time. Moving
+    // into another section changes the top line and the numerals along the foot.
+    if (q.section !== shown) {
+      shown = q.section;
+      sectionN.textContent = q.section.n;
+      sectionTitle.textContent = q.section.title;
+      list.replaceChildren(
+        ...questions.flatMap((other, j) => {
+          if (other.section !== q.section) return [];
+          const li = document.createElement('li');
+          li.append(numeralButton(other, j));
+          return [li];
+        }),
+      );
+      sectionsList.querySelectorAll('.solve-sec').forEach((sec, k) => {
+        sec.classList.toggle('is-current', [...new Set(questions.map((x) => x.section))][k] === q.section);
+      });
+      revealSection();
+    }
+    solve.querySelectorAll<HTMLButtonElement>('button[data-q]').forEach((b) => {
+      if (b.dataset.q === String(i)) b.setAttribute('aria-current', 'step');
       else b.removeAttribute('aria-current');
     });
     prev.disabled = i === 0;
@@ -284,7 +369,7 @@
         '- Do not write out a full solution, and do not reveal points I have not reached, unless I ask.',
         '- If part of the photo is hard to read, say which part instead of guessing.',
       ].join('\n'),
-      `Subject: ${subject}\nSection ${section.n}: ${section.title}`,
+      `Subject: ${subject}\nSection ${q.section.n}: ${q.section.title}`,
       `Question ${q.n}\n${question}`,
       cited.length ? `Statements the question cites, as given in my notes:\n${cited.join('\n\n')}` : '',
       `Checking notes (for you; do not quote them back in full):\n${q.item.dataset.answerCtx ?? ''}`,
@@ -408,8 +493,9 @@
 
   .solve-frame {
     display: grid;
-    grid-template-rows: auto 1fr auto;
-    min-height: 100%;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    row-gap: clamp(1rem, 3vh, 1.75rem);
+    height: 100%;
     max-width: 100rem;
     margin: 0 auto;
     padding: clamp(1rem, 3.5vh, 2rem) var(--gutter);
@@ -459,14 +545,128 @@
   button.solve-label:hover:not(:disabled) { color: var(--red); }
   .solve-close { flex: none; padding-block: 0.5rem; }
 
-  /* The question stands alone, larger than the notes, a little above the middle of the window. */
+  /* The question, and with every question open, the rail of sections beside it. */
+  .solve-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+  }
+
+  .solve-sections { display: none; }
+
+  @media (min-width: 960px) {
+    /* The rail stands to the left of the question, as the contents stand to the left of the notes. */
+    .solve[data-all] .solve-body {
+      grid-template-columns: clamp(18rem, 27vw, 25rem) minmax(0, 1fr);
+      gap: clamp(1.5rem, 3vw, 3rem);
+    }
+
+    .solve[data-all] .solve-sections {
+      display: flex;
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .solve[data-all] .solve-main { grid-column: 2; }
+  }
+
+  /* The question stands alone, larger than the notes, a little above the middle of the window. It
+     scrolls in its own space when it is longer than the window. */
   .solve-main {
-    align-self: start;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: none;
     width: 100%;
     max-width: calc(36em + var(--margin-col));
     margin: 0 auto;
     padding-block: clamp(3rem, 16vh, 9rem) 3rem;
   }
+
+  .solve-main::-webkit-scrollbar { display: none; }
+
+  /* The rail: its heading stands fixed above the list of sections, which scrolls on its own beneath
+     it, so nothing passes behind the heading. It reads like the contents: each section's numeral and
+     title, which open its first question, and under them the numerals of its questions, the one
+     being solved in vermilion. */
+  .solve-sections {
+    flex-direction: column;
+    align-self: start;
+    max-height: 100%;
+    min-height: 0;
+  }
+
+  .solve-sections-head {
+    flex: none;
+    padding-bottom: 0.6rem;
+    font-family: var(--face-text);
+    font-weight: 400;
+    font-size: 1.125rem;
+    line-height: 1.3;
+    color: var(--ink);
+  }
+
+  .solve-sections-list {
+    min-height: 0;
+    margin: 0;
+    padding: 0 0 1rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+  }
+
+  .solve-sections-list::-webkit-scrollbar { display: none; }
+
+  .solve-sections-list,
+  .solve-sections :global(.solve-sec ol) { list-style: none; }
+
+  .solve-sections :global(.solve-sec + .solve-sec) { margin-top: 0.5rem; }
+
+  .solve-sections :global(.solve-sec-head) {
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr);
+    width: 100%;
+    padding: 0.35rem 0 0.15rem;
+    border: 0;
+    background: none;
+    text-align: left;
+    font-family: var(--face-text);
+    font-size: 1rem;
+    line-height: 1.35;
+    color: var(--ink-2);
+    cursor: pointer;
+  }
+
+  .solve-sections :global(.solve-sec-n) {
+    font-variant-numeric: lining-nums;
+    color: var(--ink-3);
+  }
+
+  .solve-sections :global(.solve-sec.is-current .solve-sec-head) { color: var(--ink); }
+  .solve-sections :global(.solve-sec-head:hover),
+  .solve-sections :global(.solve-sec-head:hover .solve-sec-n) { color: var(--red); }
+
+  .solve-sections :global(.solve-sec ol) {
+    display: flex;
+    flex-wrap: wrap;
+    padding-left: 2rem;
+  }
+
+  .solve-sections :global(.solve-sec ol button) {
+    min-width: 2.5rem;
+    min-height: 2rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    text-align: left;
+    font-family: var(--face-text);
+    font-size: 0.875rem;
+    font-variant-numeric: lining-nums tabular-nums;
+    color: var(--ink-3);
+    cursor: pointer;
+  }
+
+  .solve-sections :global(.solve-sec ol button:hover),
+  .solve-sections :global(.solve-sec ol button[aria-current]) { color: var(--red); }
 
   .solve-question {
     display: grid;

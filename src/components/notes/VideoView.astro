@@ -1,8 +1,9 @@
 ---
-// Watching a section's video on the page. Choosing a <Video> card opens a plain page over the notes
-// with the video playing in YouTube's privacy-enhanced player, and a link to open it on YouTube
-// instead. The player is made when the view opens and removed when it closes, so nothing loads from
-// YouTube before a video is chosen and nothing plays after it is closed.
+// Watching the page's videos. Choosing a <Video> card opens a plain page over the notes with the
+// video playing in YouTube's privacy-enhanced player, a link to open it on YouTube instead, and a
+// list of every video on the page in order, from which another can be chosen. The player is made
+// when a video is chosen and removed when the view closes, so nothing loads from YouTube before then
+// and nothing plays after.
 ---
 
 <dialog class="watch" aria-labelledby="watch-heading" autofocus>
@@ -22,8 +23,15 @@
       </p>
     </header>
 
-    <div class="watch-stage">
-      <div class="watch-player" data-watch-player></div>
+    <div class="watch-body">
+      <div class="watch-stage">
+        <div class="watch-player" data-watch-player></div>
+      </div>
+
+      <nav class="watch-list" aria-labelledby="watch-list-heading">
+        <h3 id="watch-list-heading" class="watch-label watch-list-head">Videos</h3>
+        <ol data-watch-list></ol>
+      </nav>
     </div>
   </div>
 </dialog>
@@ -33,42 +41,117 @@
   const sectionN = watch.querySelector<HTMLElement>('[data-watch-section-n]')!;
   const heading = watch.querySelector<HTMLElement>('[data-watch-title]')!;
   const out = watch.querySelector<HTMLAnchorElement>('[data-watch-out]')!;
+  const stage = watch.querySelector<HTMLElement>('.watch-stage')!;
   const player = watch.querySelector<HTMLElement>('[data-watch-player]')!;
+  const list = watch.querySelector<HTMLOListElement>('[data-watch-list]')!;
+  const still = matchMedia('(prefers-reduced-motion: reduce)');
+
+  interface Video {
+    id: string;
+    title: string;
+    duration: string;
+    href: string;
+    /** The numeral of the section the video opens. */
+    n: string;
+  }
+
+  let videos: Video[] = [];
+  let at = -1;
+
+  // Every video on the page, in order, each with the numeral of the section it opens.
+  function collect(): Video[] {
+    const cards = [...document.querySelectorAll<HTMLAnchorElement>('a[data-video]')].filter((a) => !watch.contains(a));
+    return cards.map((card) => {
+      let h = card.previousElementSibling;
+      while (h && h.tagName !== 'H2') h = h.previousElementSibling;
+      const headings = [...(card.parentElement?.querySelectorAll(':scope > h2') ?? [])];
+      return {
+        id: card.dataset.video!,
+        title: card.dataset.videoTitle ?? '',
+        duration: card.dataset.videoDuration ?? '',
+        href: card.href,
+        n: h ? String(headings.indexOf(h) + 1) : '',
+      };
+    });
+  }
 
   document.addEventListener('click', (e) => {
-    // A modified or middle click keeps the link's own meaning: open the video on YouTube.
+    // The control above the contents opens the page's first video; the list holds the rest.
+    if ((e.target as Element).closest('[data-watch-all]')) {
+      const first = document.querySelector<HTMLAnchorElement>('a[data-video]');
+      if (first && !watch.contains(first)) open(first);
+      return;
+    }
+    // A modified or middle click on a card keeps the link's own meaning: open the video on YouTube.
     if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     const card = (e.target as Element).closest<HTMLAnchorElement>('a[data-video]');
-    if (!card) return;
+    if (!card || watch.contains(card)) return;
     e.preventDefault();
     open(card);
   });
 
   function open(card: HTMLAnchorElement) {
-    const id = card.dataset.video!;
+    videos = collect();
+    list.replaceChildren(
+      ...videos.map((v, i) => {
+        const li = document.createElement('li');
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'watch-item';
+        const n = document.createElement('span');
+        n.className = 'watch-item-n';
+        n.textContent = v.n;
+        const title = document.createElement('span');
+        title.className = 'watch-item-title';
+        title.textContent = v.title;
+        const time = document.createElement('span');
+        time.className = 'watch-item-time';
+        time.textContent = v.duration;
+        b.append(n, title, time);
+        b.addEventListener('click', () => play(i));
+        li.append(b);
+        return li;
+      }),
+    );
 
-    // The section is the nearest heading before the card; its numeral is its place among the headings.
-    let h = card.previousElementSibling;
-    while (h && h.tagName !== 'H2') h = h.previousElementSibling;
-    const headings = [...(card.parentElement?.querySelectorAll(':scope > h2') ?? [])];
-    sectionN.textContent = h ? String(headings.indexOf(h) + 1) : '';
-    heading.textContent = card.dataset.videoTitle ?? '';
-    out.href = card.href;
+    play(videos.findIndex((v) => v.id === card.dataset.video), false);
+    watch.showModal();
+    list.querySelector('[aria-current]')?.scrollIntoView({ block: 'nearest' });
+  }
+
+  function play(i: number, animate = true) {
+    if (i < 0 || i >= videos.length || (i === at && watch.open)) return;
+    at = i;
+    const v = videos[i];
+    sectionN.textContent = v.n;
+    heading.textContent = v.title;
+    out.href = v.href;
+
+    list.querySelectorAll('button').forEach((b, j) => {
+      if (j === i) b.setAttribute('aria-current', 'true');
+      else b.removeAttribute('aria-current');
+    });
 
     const frame = document.createElement('iframe');
-    frame.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?autoplay=1&rel=0&playsinline=1`;
-    frame.title = card.dataset.videoTitle ?? 'Video';
+    frame.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(v.id)}?autoplay=1&rel=0&playsinline=1`;
+    frame.title = v.title || 'Video';
     frame.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
     frame.allowFullscreen = true;
     frame.referrerPolicy = 'strict-origin-when-cross-origin';
     player.replaceChildren(frame);
 
-    watch.showModal();
+    // Another video set in place of the last inks in, as a page does.
+    if (animate && !still.matches) {
+      stage.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 380, easing: 'cubic-bezier(0.16, 1, 0.3, 1)' });
+    }
   }
 
   watch.querySelector('[data-watch-close]')!.addEventListener('click', () => watch.close());
   // Closing, by the control or by Escape, takes the player away so the video stops.
-  watch.addEventListener('close', () => player.replaceChildren());
+  watch.addEventListener('close', () => {
+    player.replaceChildren();
+    at = -1;
+  });
 </script>
 
 <style>
@@ -91,7 +174,7 @@
 
   :global(html:has(dialog.watch[open])) { overflow: hidden; }
 
-  /* Opening, the page comes first, then where you are, then the player inks in. */
+  /* Opening, the page comes first, then where you are, the player and the list ink in. */
   @media (prefers-reduced-motion: no-preference) {
     .watch {
       opacity: 0;
@@ -107,13 +190,14 @@
       transition-timing-function: var(--ease-out);
     }
 
-    .watch[open] :is(.watch-top, .watch-stage) { transition: opacity 520ms var(--ease-out); }
+    .watch[open] :is(.watch-top, .watch-stage, .watch-list) { transition: opacity 520ms var(--ease-out); }
     .watch[open] .watch-top { transition-delay: 80ms; }
     .watch[open] .watch-stage { transition-delay: 180ms; }
+    .watch[open] .watch-list { transition-delay: 280ms; }
 
     @starting-style {
       .watch[open],
-      .watch[open] :is(.watch-top, .watch-stage) { opacity: 0; }
+      .watch[open] :is(.watch-top, .watch-stage, .watch-list) { opacity: 0; }
     }
   }
 
@@ -171,6 +255,7 @@
     border: 0;
     background: none;
     font-family: var(--face-text);
+    font-weight: 400;
     font-size: 0.8125rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
@@ -199,10 +284,18 @@
 
   .watch-out:hover { color: var(--red); }
 
-  /* The player keeps to 16:9 at the largest size the window allows, centred in the space left. */
+  /* The player beside the list of videos, the two starting on one line. */
+  .watch-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) clamp(15rem, 22vw, 20rem);
+    gap: clamp(1.5rem, 3vw, 3rem);
+    min-height: 0;
+  }
+
+  /* The player keeps to 16:9 at the largest size its space allows. */
   .watch-stage {
     display: grid;
-    place-items: center;
+    place-items: start center;
     min-height: 0;
     container-type: size;
   }
@@ -217,6 +310,78 @@
     width: 100%;
     height: 100%;
     border: 0;
+  }
+
+  /* The list reads like the contents rail: numerals in pencil grey, titles in iron gall, the video
+     playing in vermilion. It scrolls within its column when it is longer than the window. */
+  .watch-list {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scroll-padding-top: 2.25rem;
+    scrollbar-width: none;
+  }
+
+  .watch-list::-webkit-scrollbar { display: none; }
+
+  /* The head stays at the top of the list, so the entries pass under it rather than off its edge. */
+  .watch-list-head {
+    position: sticky;
+    top: 0;
+    padding-bottom: 0.5rem;
+    background: var(--paper);
+  }
+
+  .watch-list ol {
+    padding: 0;
+    list-style: none;
+  }
+
+  .watch-list :global(.watch-item) {
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr);
+    width: 100%;
+    padding: 0.45rem 0;
+    border: 0;
+    background: none;
+    text-align: left;
+    font-family: var(--face-text);
+    font-size: 1rem;
+    line-height: 1.35;
+    color: var(--ink-2);
+    cursor: pointer;
+  }
+
+  .watch-list :global(.watch-item-n) {
+    grid-row: 1 / span 2;
+    font-variant-numeric: lining-nums;
+    color: var(--ink-3);
+  }
+
+  .watch-list :global(.watch-item-title) { text-wrap: pretty; }
+
+  .watch-list :global(.watch-item-time) {
+    margin-top: 0.2rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    font-variant-numeric: lining-nums tabular-nums;
+    color: var(--ink-3);
+  }
+
+  .watch-list :global(.watch-item:hover),
+  .watch-list :global(.watch-item:hover .watch-item-n),
+  .watch-list :global(.watch-item[aria-current]),
+  .watch-list :global(.watch-item[aria-current] .watch-item-n) { color: var(--red); }
+
+  /* Below the facing-pages width the list goes under the player and scrolls in the space left. */
+  @media (max-width: 959px) {
+    .watch-body {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: auto minmax(0, 1fr);
+    }
+
+    .watch-stage { container-type: normal; }
+    .watch-player { width: 100%; }
   }
 
   @media (max-width: 599px) {
