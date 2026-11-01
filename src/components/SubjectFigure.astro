@@ -1,0 +1,34 @@
+---
+// A subject's exact figure, drawn on a 32-unit grid.
+import type { SubjectFigureKey } from '../data/catalog';
+
+interface Props {
+  figure: SubjectFigureKey;
+  /** Rendered size in px. */
+  size: number;
+}
+
+const { figure, size } = Astro.props;
+
+const labels: Record<SubjectFigureKey, string> = {
+  triangle: 'An equilateral triangle with its three axes of symmetry.',
+};
+---
+
+<svg class="subject-figure" width={size} height={size} viewBox="0 0 32 32" role="img" aria-label={labels[figure]}>
+  {figure === 'triangle' && (
+    <>
+      <polygon points="16,3 31,29 1,29" fill="var(--yellow)" />
+      <line x1="16" y1="3" x2="16" y2="29" stroke="var(--red)" stroke-width="1.5" />
+      <line x1="31" y1="29" x2="8.5" y2="16" stroke="var(--blue)" stroke-width="1.5" />
+      <line x1="1" y1="29" x2="23.5" y2="16" stroke="var(--ink)" stroke-width="1.5" />
+    </>
+  )}
+</svg>
+
+<style>
+  .subject-figure {
+    display: block;
+    overflow: visible;
+  }
+</style>

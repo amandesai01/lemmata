@@ -1,0 +1,234 @@
+---
+// Fig. 1: the six symmetries of the equilateral triangle, after Byrne.
+// The axes are fixed in the plane; the triangle and its corner marks move.
+// Triangle side 520, centroid at (290, 329.89).
+---
+
+<figure class="symmetry" aria-labelledby="fig-1-caption">
+  <svg class="plate-figure" viewBox="0 0 580 510" role="img" aria-label="An equilateral triangle in yellow with its three axes of symmetry in red, blue and black, and a mark on each corner.">
+    <g class="body" data-body>
+      <polygon points="290,29.67 550,480 30,480" fill="var(--yellow)" />
+      <circle data-corner="0" cx="290" cy="29.67" r="14" fill="var(--red)" />
+      <circle data-corner="1" cx="550" cy="480" r="14" fill="var(--blue)" />
+      <circle data-corner="2" cx="30" cy="480" r="14" fill="var(--ink)" />
+    </g>
+    <g stroke-width="7" stroke-linecap="butt">
+      <line x1="290" y1="29.67" x2="290" y2="480" stroke="var(--red)" />
+      <line x1="550" y1="480" x2="160" y2="254.83" stroke="var(--blue)" />
+      <line x1="30" y1="480" x2="420" y2="254.83" stroke="var(--ink)" />
+    </g>
+    <path d="M 350.14 308 A 64 64 0 0 1 268.11 390.03" fill="none" stroke="var(--ink)" stroke-width="3" />
+    <polygon points="257.77,386.27 266.06,395.67 270.16,384.39" fill="var(--ink)" />
+  </svg>
+
+  <figcaption id="fig-1-caption" class="caption">
+    <span class="fig-num">Fig. 1</span>
+    <p class="caption-text">
+      The triangle has six symmetries. Reflect it in{' '}
+      <button type="button" class="op" data-op="reflect-red" style="--op-ink: var(--red)"><svg class="glyph" viewBox="0 0 12 12" aria-hidden="true"><line x1="6" y1="0.5" x2="6" y2="11.5" stroke="var(--red)" stroke-width="2.4" /></svg>the red axis</button>,{' '}
+      <button type="button" class="op" data-op="reflect-blue" style="--op-ink: var(--blue)"><svg class="glyph" viewBox="0 0 12 12" aria-hidden="true"><line x1="1" y1="3.1" x2="11" y2="8.9" stroke="var(--blue)" stroke-width="2.4" /></svg>the blue axis</button>{' '}
+      or{' '}
+      <button type="button" class="op" data-op="reflect-black" style="--op-ink: var(--ink)"><svg class="glyph" viewBox="0 0 12 12" aria-hidden="true"><line x1="11" y1="3.1" x2="1" y2="8.9" stroke="var(--ink)" stroke-width="2.4" /></svg>the black axis</button>;
+      turn it{' '}
+      <button type="button" class="op" data-op="rotate-1" style="--op-ink: var(--ink)"><svg class="glyph" viewBox="0 0 12 12" aria-hidden="true"><path d="M 9.5 3.2 A 4.5 4.5 0 1 1 3 2.6" fill="none" stroke="var(--ink)" stroke-width="1.6" /><polygon points="5.42,0.5 1.18,1.27 4.06,4.59" fill="var(--ink)" /></svg>a third</button>{' '}
+      or{' '}
+      <button type="button" class="op" data-op="rotate-2" style="--op-ink: var(--ink)"><svg class="glyph" viewBox="0 0 12 12" aria-hidden="true"><path d="M 9.5 3.2 A 4.5 4.5 0 1 1 3 2.6" fill="none" stroke="var(--ink)" stroke-width="1.6" /><polygon points="5.42,0.5 1.18,1.27 4.06,4.59" fill="var(--ink)" /></svg>two thirds</button>{' '}
+      of a turn clockwise; or{' '}
+      <button type="button" class="op op-identity" data-op="identity" style="--op-ink: var(--ink-3)"><svg class="glyph" viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="4" fill="none" stroke="var(--ink)" stroke-width="1.6" /></svg>leave it as it is</button>.
+      Any two, done one after the other, make one of the six. Together they form the group <var>D</var><sub>3</sub>.
+    </p>
+    <p class="readout" data-readout aria-live="polite">The corners are marked so you can see where each one goes.</p>
+  </figcaption>
+</figure>
+
+<script>
+  type Ink = 'red' | 'blue' | 'black';
+  type Op = 'reflect-red' | 'reflect-blue' | 'reflect-black' | 'rotate-1' | 'rotate-2' | 'identity';
+
+  // Corner positions: 0 top, 1 lower right, 2 lower left.
+  const START: Ink[] = ['red', 'blue', 'black'];
+  const FILL: Record<Ink, string> = { red: 'var(--red)', blue: 'var(--blue)', black: 'var(--ink)' };
+
+  // new[i] = old[source[i]]
+  const SOURCE: Record<Op, [number, number, number]> = {
+    'reflect-red': [0, 2, 1],
+    'reflect-blue': [2, 1, 0],
+    'reflect-black': [1, 0, 2],
+    'rotate-1': [2, 0, 1],
+    'rotate-2': [1, 2, 0],
+    identity: [0, 1, 2],
+  };
+
+  // Axis directions in SVG coordinates (y down), measured from the centroid.
+  const AXIS_ANGLE: Partial<Record<Op, number>> = { 'reflect-red': 90, 'reflect-blue': 30, 'reflect-black': 150 };
+
+  function keyframes(op: Op): Keyframe[] | null {
+    const angle = AXIS_ANGLE[op];
+    if (angle !== undefined) {
+      return [
+        { transform: `rotate(${angle}deg) scaleY(1) rotate(${-angle}deg)` },
+        { transform: `rotate(${angle}deg) scaleY(-1) rotate(${-angle}deg)` },
+      ];
+    }
+    if (op === 'rotate-1') return [{ transform: 'rotate(0deg)' }, { transform: 'rotate(120deg)' }];
+    if (op === 'rotate-2') return [{ transform: 'rotate(0deg)' }, { transform: 'rotate(240deg)' }];
+    return null;
+  }
+
+  function describe(op: Op, before: Ink[], after: Ink[]): string {
+    const moved = [0, 1, 2].filter((i) => before[i] !== after[i]).map((i) => before[i]);
+    let text: string;
+    if (op === 'identity') {
+      text = 'Nothing moved. Doing nothing counts as a symmetry too.';
+    } else if (op.startsWith('reflect')) {
+      text = `Reflected in the ${op.slice(8)} axis: the ${moved[0]} and ${moved[1]} corners changed places.`;
+    } else {
+      text = `Turned ${op === 'rotate-1' ? 'a third' : 'two thirds'} of a turn: every corner moved on.`;
+    }
+    if (op !== 'identity' && after.every((ink, i) => ink === START[i])) text += ' Each mark is back where it started.';
+    return text;
+  }
+
+  const figure = document.querySelector<HTMLElement>('.symmetry');
+  const body = figure?.querySelector<SVGGElement>('[data-body]');
+  const readout = figure?.querySelector<HTMLElement>('[data-readout]');
+
+  if (figure && body && readout) {
+    const corners = [0, 1, 2].map((i) => body.querySelector<SVGCircleElement>(`[data-corner="${i}"]`)!);
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let state: Ink[] = [...START];
+    let running: { anim: Animation; next: Ink[] } | null = null;
+
+    const paint = () => corners.forEach((c, i) => c.setAttribute('fill', FILL[state[i]]));
+
+    const settle = () => {
+      if (!running) return;
+      state = running.next;
+      paint();
+      running.anim.cancel();
+      running = null;
+    };
+
+    figure.addEventListener('click', (event) => {
+      const button = (event.target as Element).closest<HTMLButtonElement>('button[data-op]');
+      if (!button) return;
+      settle();
+
+      const op = button.dataset.op as Op;
+      const before = state;
+      const next = SOURCE[op].map((from) => before[from]);
+      readout.textContent = describe(op, before, next);
+
+      const frames = keyframes(op);
+      if (!frames || reduceMotion.matches) {
+        state = next;
+        paint();
+        return;
+      }
+
+      const anim = body.animate(frames, {
+        duration: op === 'rotate-2' ? 1100 : 820,
+        easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+        fill: 'forwards',
+      });
+      running = { anim, next };
+      anim.finished.then(() => { if (running?.anim === anim) settle(); }).catch(() => {});
+    });
+  }
+</script>
+
+<style>
+  .symmetry {
+    display: grid;
+    align-content: start;
+    gap: clamp(1.25rem, 2.6vw, 2rem);
+  }
+
+  .plate-figure {
+    display: block;
+    width: 100%;
+    max-width: 40rem;
+    height: auto;
+    overflow: visible;
+  }
+
+  .body {
+    transform-box: view-box;
+    transform-origin: 290px 329.89px;
+  }
+
+  .caption {
+    display: grid;
+    grid-template-columns: var(--margin-col) minmax(0, 30rem);
+    column-gap: 0;
+    row-gap: 0.75rem;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+
+  .fig-num {
+    grid-row: 1;
+    font-size: 0.8125rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink);
+    padding-top: 0.2rem;
+  }
+
+  .caption-text,
+  .readout {
+    grid-column: 2;
+    max-width: 34em;
+    text-wrap: pretty;
+  }
+
+  .readout {
+    font-style: italic;
+    color: var(--ink-3);
+    min-height: 3.2em;
+  }
+
+  .op {
+    font: inherit;
+    color: var(--ink);
+    background: none;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-color: var(--op-ink);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.24em;
+    white-space: nowrap;
+  }
+
+  .op-identity { text-decoration-style: dotted; }
+
+  .op:hover { text-decoration-thickness: 3px; }
+  .op[data-op='reflect-red']:hover { color: var(--red); }
+  .op[data-op='reflect-blue']:hover { color: var(--blue); }
+
+  .glyph {
+    width: 0.72em;
+    height: 0.72em;
+    margin-right: 0.28em;
+    vertical-align: -0.04em;
+    overflow: visible;
+  }
+
+  var { font-style: italic; }
+  sub { font-size: 0.7em; line-height: 0; }
+
+  @media (max-width: 959px) {
+    .plate-figure { max-width: min(100%, 26rem); }
+    .caption { grid-template-columns: var(--margin-col) minmax(0, 1fr); }
+  }
+
+  /* Phone: the figure keeps its place but gives up height; caption text lines up with the subject names. */
+  @media (max-width: 599px) {
+    .plate-figure { max-width: min(100%, 17.5rem); }
+    .caption { grid-template-columns: 5.25rem minmax(0, 1fr); }
+  }
+</style>
