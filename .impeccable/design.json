@@ -1,0 +1,361 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-01T17:17:41+00:00",
+  "title": "Design System: Lemmata",
+  "extensions": {
+    "colorMeta": {
+      "ultramarine": {
+        "role": "primary",
+        "displayName": "Ultramarine",
+        "canonical": "#1C3F94",
+        "oklch": "oklch(39.7% 0.146 264.0)",
+        "cssVar": "--blue",
+        "tonalRamp": [
+          "#000232",
+          "#051D5D",
+          "#193A8C",
+          "#3B5DA8",
+          "#6381BF",
+          "#8CA5D6",
+          "#B8CAED",
+          "#E7EFFF"
+        ]
+      },
+      "vermilion": {
+        "role": "secondary",
+        "displayName": "Vermilion",
+        "canonical": "#D2321E",
+        "oklch": "oklch(56.7% 0.199 30.8)",
+        "cssVar": "--red",
+        "tonalRamp": [
+          "#190403",
+          "#451008",
+          "#771C11",
+          "#AD2919",
+          "#DA4A36",
+          "#F0816E",
+          "#FFB4A6",
+          "#FFE9E5"
+        ]
+      },
+      "chrome-yellow": {
+        "role": "tertiary",
+        "displayName": "Chrome Yellow",
+        "canonical": "#EDB21B",
+        "oklch": "oklch(79.7% 0.159 83.6)",
+        "cssVar": "--yellow",
+        "tonalRamp": [
+          "#110A00",
+          "#312200",
+          "#553E02",
+          "#7C5B06",
+          "#A57B0D",
+          "#D09C15",
+          "#F8BF40",
+          "#FFECC9"
+        ]
+      },
+      "plate-white": {
+        "role": "neutral",
+        "displayName": "Plate White",
+        "canonical": "#FCFCFA",
+        "oklch": "oklch(99.1% 0.003 106.4)",
+        "cssVar": "--paper",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#252525",
+          "#424241",
+          "#616160",
+          "#828281",
+          "#A5A5A4",
+          "#C9C9C7",
+          "#EEEEED"
+        ]
+      },
+      "lamp-black": {
+        "role": "neutral",
+        "displayName": "Lamp Black",
+        "canonical": "#141414",
+        "oklch": "oklch(19.1% 0.000 89.9)",
+        "cssVar": "--ink",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#A5A5A5",
+          "#C9C9C9",
+          "#EEEEEE"
+        ]
+      },
+      "iron-gall": {
+        "role": "neutral",
+        "displayName": "Iron Gall",
+        "canonical": "#4A4A47",
+        "oklch": "oklch(40.8% 0.005 106.6)",
+        "cssVar": "--ink-2",
+        "tonalRamp": [
+          "#0B0B0A",
+          "#252523",
+          "#42423F",
+          "#61615F",
+          "#828280",
+          "#A5A5A3",
+          "#C9C9C8",
+          "#EEEEEE"
+        ]
+      },
+      "pencil-grey": {
+        "role": "neutral",
+        "displayName": "Pencil Grey",
+        "canonical": "#6B6B67",
+        "oklch": "oklch(52.7% 0.006 106.6)",
+        "cssVar": "--ink-3",
+        "tonalRamp": [
+          "#0B0B0A",
+          "#252523",
+          "#42423F",
+          "#61615E",
+          "#82827F",
+          "#A5A5A2",
+          "#C9C9C7",
+          "#EEEEED"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "wordmark": {
+        "displayName": "Wordmark",
+        "css": "clamp(2.25rem, 4.2vw, 3.5rem)",
+        "case": "uppercase",
+        "purpose": "LEMMATA at the head of the homepage only."
+      },
+      "display": {
+        "displayName": "Display",
+        "css": "clamp(2.75rem, 5vw, 4.75rem)",
+        "purpose": "A subject's name at the head of its notes."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "css": "clamp(1.625rem, 2.3vw, 2rem)",
+        "purpose": "Section headings in notes, after a vermilion numeral."
+      },
+      "lead": {
+        "displayName": "Lead",
+        "css": "clamp(1.125rem, 1.5vw, 1.3125rem)",
+        "purpose": "The defining line under the wordmark."
+      },
+      "title": {
+        "displayName": "Title",
+        "css": "1.125rem / 1.3, Ultramarine",
+        "purpose": "Subject titles in the homepage list, each a link."
+      },
+      "body": {
+        "displayName": "Body",
+        "css": "1.0625rem / 1.6, measure 34 to 36em",
+        "purpose": "All reading text; maths symbols fall back to STIX Two Text."
+      },
+      "body-small": {
+        "displayName": "Body Small",
+        "css": "1rem / 1.5",
+        "purpose": "The homepage paragraph, figure captions, contents entries."
+      },
+      "small": {
+        "displayName": "Small",
+        "css": "0.875rem / 1.5",
+        "purpose": "Subject descriptions under their titles."
+      },
+      "note": {
+        "displayName": "Note",
+        "css": "italic 0.9375rem / 1.55",
+        "fontStyle": "italic",
+        "purpose": "Figure readouts."
+      },
+      "label": {
+        "displayName": "Label",
+        "css": "0.8125rem, tracked 0.12 to 0.16em",
+        "case": "uppercase",
+        "purpose": "FIG. numerals, theorem heads, fact labels, area headings, CONTENTS."
+      },
+      "masthead": {
+        "displayName": "Masthead",
+        "css": "Display 1rem, tracked 0.12em",
+        "case": "uppercase",
+        "purpose": "The LEMMATA home link at the top of reading pages."
+      }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "The only easing curve (--ease-out)."
+      },
+      {
+        "name": "symmetry",
+        "value": "820ms",
+        "purpose": "A reflection or a third of a turn in a figure; a subject figure turning while its title is hovered or focused."
+      },
+      {
+        "name": "symmetry-long",
+        "value": "1100ms",
+        "purpose": "Two thirds of a turn."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "none",
+        "purpose": "Under prefers-reduced-motion every transition is removed; figures change state without animating."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "phone",
+        "value": "599px",
+        "purpose": "Max width for phone adjustments (figures shrink, captions re-align)."
+      },
+      {
+        "name": "facing-pages",
+        "value": "960px",
+        "purpose": "Min width for the 45 : 55 facing-page layout."
+      },
+      {
+        "name": "wide",
+        "value": "1440px",
+        "purpose": "Reference desktop width."
+      }
+    ],
+    "layout": {
+      "frame": "100rem",
+      "gutter": "clamp(1rem, 4.4vw, 4rem)",
+      "marginColumn": "4rem",
+      "measure": "34 to 36em",
+      "homepage": "Lifted to the optical vertical centre (free space 2 : 3). From 960px: two equal facing pages across the frame (column gap clamp(2.5rem, 4.4vw, 4rem)) with the 1px Lamp Black rule upright between them as the spine; both pages and the spine start on the wordmark's cap line. Left page: wordmark; dictionary entry (pronunciation line 0.875rem below, sense beneath); defining line (clamp(1.25rem, 3svh, 1.75rem) below) and paragraph. Right page: Contents heading (1.5rem); area labels (1.125rem below, 1.75rem between) and subject lists (entries 1rem apart). Below 960px: one 40rem sheet on the frame's left edge (lined up with the colophon), the rule lying flat between intro and contents (margins clamp(2rem, 5svh, 3rem) / clamp(1.5rem, 4svh, 2.25rem)). Colophon at the bottom of the window.",
+      "readingPage": "Two columns: figure rail minmax(13rem, 1fr) holding the figure, its caption (FIG. label above, 0.9375rem) and the sticky contents; text column 4fr holding title and prose on one edge, measure 36em plus the 4rem margin column.",
+      "verticalRhythm": "Page-level gaps scale with svh so a page that fits one screen never scrolls.",
+      "pageHeight": "body is a flex column at min-height 100svh; main grows; the footer rests at the bottom of short pages."
+    }
+  },
+  "components": [
+    {
+      "name": "Subject List",
+      "kind": "custom",
+      "refersTo": "subject-link",
+      "description": "The homepage contents: a 1px rule, a Contents heading, then each area's subjects as plain linked entries, like search results. No box.",
+      "html": "<section class=\"ds-area\"><hr class=\"ds-rule\"><h2 class=\"ds-contents-head\">Contents</h2><h3 class=\"ds-area-head\">Abstract Algebra</h3><ol class=\"ds-results\"><li class=\"ds-result\"><svg class=\"ds-figure\" width=\"24\" height=\"24\" viewBox=\"0 0 32 32\" role=\"img\" aria-label=\"An equilateral triangle with its three axes of symmetry.\"><polygon points=\"16,3 31,29 1,29\" fill=\"#EDB21B\"/><line x1=\"16\" y1=\"3\" x2=\"16\" y2=\"29\" stroke=\"#D2321E\" stroke-width=\"1.5\"/><line x1=\"31\" y1=\"29\" x2=\"8.5\" y2=\"16\" stroke=\"#1C3F94\" stroke-width=\"1.5\"/><line x1=\"1\" y1=\"29\" x2=\"23.5\" y2=\"16\" stroke=\"#141414\" stroke-width=\"1.5\"/></svg><h4 class=\"ds-result-name\"><a href=\"#\">Abstract Group Theory</a></h4><p class=\"ds-result-desc\">Groups from the axioms: cosets and Lagrange’s theorem, quotients, homomorphisms, actions and the Sylow theorems.</p></li></ol></section>",
+      "css": ".ds-area { max-width: 40rem; font-family: var(--face-text, \"Libre Caslon Text\", Georgia, serif); } .ds-rule { margin: 0 0 1.75rem; border: 0; border-top: 1px solid var(--ink, #141414); } .ds-contents-head { margin: 0; font-weight: 400; font-size: 1.5rem; line-height: 1.2; color: var(--ink, #141414); } .ds-area-head { margin: 1.125rem 0 0.75rem; font-weight: 400; font-size: 0.8125rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink, #141414); } .ds-results { display: grid; gap: 1rem; margin: 0; padding: 0; list-style: none; } .ds-result { display: grid; grid-template-columns: 24px minmax(0, 1fr); column-gap: 0.75rem; align-items: start; } .ds-figure { grid-row: 1 / span 2; margin-top: 0.1875rem; overflow: visible; transform-origin: 50% 63.54%; transition: transform 820ms var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)); } .ds-result:has(a:hover, a:focus-visible) .ds-figure { transform: rotate(120deg); } .ds-result-name { margin: 0; font-weight: 400; font-size: 1.125rem; line-height: 1.3; } .ds-result-name a { color: var(--blue, #1C3F94); text-decoration: none; text-underline-offset: 0.22em; text-decoration-thickness: 1px; } .ds-result-name a:hover { color: var(--red, #D2321E); text-decoration: underline; text-decoration-color: var(--red, #D2321E); } .ds-result-name a:focus-visible { outline: 2px solid var(--blue, #1C3F94); outline-offset: 3px; } .ds-result-desc { grid-column: 2; margin: 0.125rem 0 0; max-width: 36em; font-size: 0.875rem; line-height: 1.5; color: var(--ink-2, #4A4A47); }"
+    },
+    {
+      "name": "Masthead",
+      "kind": "nav",
+      "refersTo": "masthead-home",
+      "description": "Reading pages only: the LEMMATA home link at the left. No other links, background or rule.",
+      "html": "<header class=\"ds-masthead\"><a class=\"ds-home\" href=\"#\">Lemmata</a></header>",
+      "css": ".ds-masthead { padding: 1.25rem 0; background: var(--paper, #FCFCFA); } .ds-home { color: var(--ink, #141414); font-family: var(--face-display, \"Libre Caslon Display\", \"Libre Caslon Text\", Georgia, serif); font-size: 1rem; letter-spacing: 0.12em; text-transform: uppercase; text-decoration: none; text-underline-offset: 0.22em; text-decoration-thickness: 1px; } .ds-home:hover { color: var(--red, #D2321E); text-decoration: underline; text-decoration-color: var(--red, #D2321E); } .ds-home:focus-visible { outline: 2px solid var(--blue, #1C3F94); outline-offset: 3px; }"
+    },
+    {
+      "name": "Figure Operation",
+      "kind": "custom",
+      "description": "A caption phrase that performs the operation it names, underlined in its axis colour with an inline glyph.",
+      "html": "<p class=\"ds-caption\">Reflect it in <button type=\"button\" class=\"ds-op\" style=\"--op-ink: #D2321E\"><svg class=\"ds-glyph\" viewBox=\"0 0 12 12\" aria-hidden=\"true\"><line x1=\"6\" y1=\"0.5\" x2=\"6\" y2=\"11.5\" stroke=\"#D2321E\" stroke-width=\"2.4\"/></svg>the red axis</button> or <button type=\"button\" class=\"ds-op\" style=\"--op-ink: #1C3F94\"><svg class=\"ds-glyph\" viewBox=\"0 0 12 12\" aria-hidden=\"true\"><line x1=\"1\" y1=\"3.1\" x2=\"11\" y2=\"8.9\" stroke=\"#1C3F94\" stroke-width=\"2.4\"/></svg>the blue axis</button>; or <button type=\"button\" class=\"ds-op ds-op-identity\" style=\"--op-ink: #6B6B67\"><svg class=\"ds-glyph\" viewBox=\"0 0 12 12\" aria-hidden=\"true\"><circle cx=\"6\" cy=\"6\" r=\"4\" fill=\"none\" stroke=\"#141414\" stroke-width=\"1.6\"/></svg>leave it as it is</button>.</p>",
+      "css": ".ds-caption { max-width: 30rem; font-family: var(--face-text, \"Libre Caslon Text\", Georgia, serif); font-size: 1rem; line-height: 1.6; color: var(--ink-2, #4A4A47); } .ds-op { font: inherit; color: var(--ink, #141414); background: none; border: 0; padding: 0; margin: 0; cursor: pointer; white-space: nowrap; text-decoration: underline; text-decoration-color: var(--op-ink); text-decoration-thickness: 2px; text-underline-offset: 0.24em; } .ds-op-identity { text-decoration-style: dotted; } .ds-op:hover { text-decoration-thickness: 3px; color: var(--op-ink); } .ds-op-identity:hover { color: var(--ink, #141414); } .ds-op:focus-visible { outline: 2px solid var(--blue, #1C3F94); outline-offset: 3px; } .ds-glyph { width: 0.72em; height: 0.72em; margin-right: 0.28em; vertical-align: -0.04em; overflow: visible; }"
+    },
+    {
+      "name": "Contents Rail",
+      "kind": "nav",
+      "refersTo": "contents-item",
+      "description": "Numbered section list on reading pages; the section being read turns Lamp Black with a Vermilion numeral.",
+      "html": "<nav class=\"ds-contents\" aria-label=\"Contents\"><p class=\"ds-contents-head\">Contents</p><ol><li><a href=\"#\"><span class=\"ds-toc-num\">1</span><span>Groups</span></a></li><li><a href=\"#\"><span class=\"ds-toc-num\">2</span><span>Subgroups</span></a></li><li><a href=\"#\" aria-current=\"location\"><span class=\"ds-toc-num\">3</span><span>Cosets and Lagrange’s theorem</span></a></li><li><a href=\"#\"><span class=\"ds-toc-num\">4</span><span>Normal subgroups and quotients</span></a></li></ol></nav>",
+      "css": ".ds-contents { font-family: var(--face-text, \"Libre Caslon Text\", Georgia, serif); max-width: 20rem; } .ds-contents-head { margin: 0 0 0.75rem; font-size: 0.8125rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink, #141414); } .ds-contents ol { margin: 0; padding: 0; list-style: none; } .ds-contents a { display: grid; grid-template-columns: 2.25rem minmax(0, 1fr); padding-block: 0.3rem; font-size: 1rem; line-height: 1.35; color: var(--ink-2, #4A4A47); text-decoration: none; } .ds-toc-num { font-variant-numeric: lining-nums tabular-nums; color: var(--ink-3, #6B6B67); } .ds-contents a:hover { color: var(--red, #D2321E); } .ds-contents a:hover span:last-child { text-decoration: underline; text-decoration-color: var(--red, #D2321E); } .ds-contents a[aria-current=\"location\"] { color: var(--ink, #141414); } .ds-contents a[aria-current=\"location\"] .ds-toc-num { color: var(--red, #D2321E); } .ds-contents a:focus-visible { outline: 2px solid var(--blue, #1C3F94); outline-offset: 3px; }"
+    },
+    {
+      "name": "Theorem Statement",
+      "kind": "custom",
+      "description": "Run-in tracked head, italic statement, displayed formula, and a proof closed by a small ink square.",
+      "html": "<div class=\"ds-theorem\"><p><span class=\"ds-env-head\">Theorem 3.3</span> (Lagrange). <span class=\"ds-stmt\">If <var>G</var> is finite and <var>H</var> ≤ <var>G</var>, then</span></p><p class=\"ds-display\">|<var>G</var>| = [<var>G</var> : <var>H</var>] · |<var>H</var>|.</p><div class=\"ds-proof\"><p><span class=\"ds-proof-head\">Proof.</span> By Lemma 3.2, <var>G</var> is the disjoint union of [<var>G</var> : <var>H</var>] cosets, each of size |<var>H</var>|.</p></div></div>",
+      "css": ".ds-theorem { max-width: 34em; font-family: var(--face-math, \"Libre Caslon Text\", \"STIX Two Text\", \"Cambria Math\", Georgia, serif); font-size: 1.0625rem; line-height: 1.6; color: var(--ink, #141414); } .ds-theorem p { margin: 1rem 0 0; } .ds-theorem p:first-child { margin-top: 0; } .ds-theorem var { font-style: italic; } .ds-env-head { margin-right: 0.45em; font-family: var(--face-text, \"Libre Caslon Text\", Georgia, serif); font-size: 0.8125rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink, #141414); } .ds-stmt { font-style: italic; } .ds-display { margin-block: 1.25rem; text-align: center; font-size: 1.125rem; } .ds-proof { color: var(--ink-2, #4A4A47); } .ds-proof-head { margin-right: 0.35em; font-style: italic; color: var(--ink, #141414); } .ds-proof p:last-child::after { content: \"\"; float: right; width: 0.5em; height: 0.5em; margin: 0.55em 0 0 1em; background: var(--ink, #141414); }"
+    },
+    {
+      "name": "Facts List",
+      "kind": "custom",
+      "description": "A subject's area; the label hangs in the margin column.",
+      "html": "<dl class=\"ds-facts\"><dt>Area</dt><dd><a href=\"#\">Abstract Algebra</a></dd></dl>",
+      "css": ".ds-facts { display: grid; grid-template-columns: 4.5rem minmax(0, 1fr); row-gap: 0.25rem; margin: 0; font-family: var(--face-text, \"Libre Caslon Text\", Georgia, serif); font-size: 1rem; } .ds-facts dt { padding-top: 0.2rem; font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3, #6B6B67); } .ds-facts dd { margin: 0; color: var(--ink, #141414); } .ds-facts a { color: inherit; text-decoration-color: var(--ink-3, #6B6B67); text-underline-offset: 0.22em; } .ds-facts a:hover { color: var(--red, #D2321E); text-decoration-color: var(--red, #D2321E); } .ds-facts a:focus-visible { outline: 2px solid var(--blue, #1C3F94); outline-offset: 3px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Coloured Proof",
+    "overview": "Lemmata borrows one idea from Oliver Byrne's 1847 colour edition of Euclid: colour is the reference. Instead of labelling a figure with letters and asking the reader to match them, the text names a part of the figure by its ink. The red axis is set in red. The section being read has a red numeral. A phrase that performs a symmetry is underlined in that axis's colour. Every saturated mark on the page points at something, and everything else is black type on white.\n\nThe mood is exact, sparse and didactic. Figures are true: the triangle really has six symmetries, and each caption states what the figure shows. Pages carry a lot of white and few elements. Type does the structural work: Caslon at one weight, with hierarchy built from size, capitals and tracking. The page is flat paper. Nothing floats, glows or rounds off.\n\nOn a reading page the figure stands in a slim left column above the contents, facing the title and the text, which take most of the width. On wide screens the homepage is a pair of facing pages. On the left is the name set as a dictionary entry (its pronunciation, then its one sense), followed by the defining line and a short paragraph. A hairline spine stands between the pages. On the right is a Contents heading over the subjects, grouped by area as plain linked entries that read like search results. On phones the pages stack, and the spine lies flat as a rule between them.",
+    "keyCharacteristics": [
+      "Four flat inks (ultramarine, vermilion, chrome yellow, lamp black) on one white ground.",
+      "Colour used as reference, never as decoration.",
+      "Caslon Display and Caslon Text at weight 400 only, roman and italic.",
+      "Numerals hang in a fixed 4rem margin column beside the text.",
+      "Square corners, no shadows, no gradients, no boxes or borders; a single hairline rule on the homepage.",
+      "One easing curve; the only extended motion is a true symmetry being performed."
+    ],
+    "rules": [
+      {
+        "name": "The Colour-Is-Reference Rule",
+        "body": "A saturated ink on the page must point at something: an axis, a figure, a state, the reader's position. An ink that refers to nothing is decoration and does not ship.",
+        "section": "colors"
+      },
+      {
+        "name": "The Yellow Field Rule",
+        "body": "Chrome Yellow fills figures and highlights selections. Text is never set in it and never laid over it.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Ground Rule",
+        "body": "Every page sits on Plate White. No cream, no tints, no grey panels, no dark sections.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Weight Rule",
+        "body": "Caslon is loaded at 400 only. Hierarchy comes from size, capitals and tracking. Bold is never used, and the browser is never allowed to fake it.",
+        "section": "typography"
+      },
+      {
+        "name": "The Run-In Head Rule",
+        "body": "Definitions, theorems, examples, proofs and figures open with a head that runs into the same line as the text (tracked capitals, or italic for \"Proof.\"). A head never sits on its own line above the text it introduces.",
+        "section": "typography"
+      },
+      {
+        "name": "The Margin Column Rule",
+        "body": "In every text column, numerals hang in the same 4rem margin column, so the eye finds sections, facts and problems down one vertical line. In a column too narrow to spare it (the figure rail on reading pages), the label sits above its text instead.",
+        "section": "layout"
+      },
+      {
+        "name": "The One Screen Rule",
+        "body": "A page whose content fits the window never scrolls. Vertical gaps between page-level blocks are set against the window's height, never as fixed or width-based padding that pushes a short page past the bottom edge.",
+        "section": "layout"
+      },
+      {
+        "name": "The Flat Plate Rule",
+        "body": "Nothing on the page sits above anything else. Shadows, glows, gradients, blurs and tinted panels are never used.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Square Corner Rule",
+        "body": "No radius on any element. A rounded corner does not belong in this world.",
+        "section": "shapes"
+      }
+    ],
+    "dos": [
+      "**Do** draw every figure with true geometry and caption it with a FIG. numeral in the margin column.",
+      "**Do** use Ultramarine for links in reading text and for focus; use Vermilion for hover and for marking where the reader is.",
+      "**Do** name a figure's part in the text by its ink, with a 2px underline in that colour when the phrase performs an operation.",
+      "**Do** keep reading text at 1.0625rem with line-height 1.6 inside a 34 to 36em measure.",
+      "**Do** take every transition from the one ease-out curve and switch it off under reduced motion."
+    ],
+    "donts": [
+      "**Don't** set text in Chrome Yellow or lay text over it.",
+      "**Don't** use cream, tinted, grey or dark grounds.",
+      "**Don't** add shadows, gradients, blur or rounded corners to anything.",
+      "**Don't** use cards, boxes or borders; a list of subjects is a list of plain linked entries, and the homepage's intro rule is the only rule.",
+      "**Don't** use bold or any Caslon weight other than 400.",
+      "**Don't** put a small label above a heading; heads run into the text instead.",
+      "**Don't** animate anything except a true symmetry or a control's direct response to the reader."
+    ]
+  }
+}
