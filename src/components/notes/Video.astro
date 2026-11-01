@@ -1,0 +1,23 @@
+---
+// The video a section follows, as a link that opens it on YouTube rather than an embedded player.
+// Its play mark hangs in the margin column, as a section numeral does.
+interface Props {
+  /** The YouTube video id: the v= of its watch URL. */
+  id: string;
+  /** What the video is about, with no channel, presenter or series names: "Cosets and Lagrange’s theorem". */
+  title: string;
+  /** Its running time as YouTube shows it: "48:12". */
+  duration?: string;
+}
+
+const { id, title, duration } = Astro.props;
+const href = `https://www.youtube.com/watch?v=${encodeURIComponent(id)}`;
+---
+
+<a class="video" href={href} target="_blank" rel="noopener noreferrer">
+  <svg class="video-mark" viewBox="0 0 12 12" aria-hidden="true"><polygon points="1,0.5 11.5,6 1,11.5" /></svg>
+  <span class="video-title">{title}</span>
+  <span class="video-meta">
+    Watch on YouTube{duration && <span class="video-time"> · {duration}</span>}<span class="visually-hidden">, opens in a new tab</span>
+  </span>
+</a>

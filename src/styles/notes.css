@@ -133,24 +133,90 @@
   background: var(--ink);
 }
 
-/* Problems are numbered by section, 8.1, 8.2, …, in the margin. */
+/* Problems, and the questions closing a section, are numbered by section, 8.1, 8.2, …, in the margin. */
 
-.problems ol {
+.problems ol,
+.questions ol {
   counter-reset: problem;
   padding-left: 0;
 }
 
-.problems ol > li {
+.problems ol > li,
+.questions ol > li {
   counter-increment: problem;
   padding-left: 2.75rem;
   margin-top: 1rem;
 }
 
-.problems ol > li::before {
+.problems ol > li::before,
+.questions ol > li::before {
   content: counter(section) '.' counter(problem);
   left: 0;
   font-size: 0.9375rem;
   font-variant-numeric: lining-nums;
+}
+
+.prose .questions { margin-top: 2.5rem; }
+
+.questions-head {
+  font-weight: 400;
+  font-size: 0.8125rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+/* The video a section follows: a play mark in the margin, its title as the link, and where it goes.
+   It opens YouTube; nothing is embedded. */
+
+.prose a.video {
+  display: grid;
+  grid-template-columns: 2.25rem minmax(0, 1fr);
+  margin-top: 1.5rem;
+  margin-bottom: 2rem;
+  color: var(--blue);
+  text-decoration: none;
+}
+
+.video-mark {
+  grid-row: 1;
+  width: 0.6875rem;
+  height: 0.6875rem;
+  margin-top: 0.42rem;
+  fill: currentColor;
+}
+
+.video-title {
+  grid-column: 2;
+  font-family: var(--face-text);
+  font-size: 1.125rem;
+  line-height: 1.3;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.22em;
+  text-wrap: pretty;
+}
+
+.video-meta {
+  grid-column: 2;
+  margin-top: 0.4rem;
+  font-family: var(--face-text);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-variant-numeric: lining-nums tabular-nums;
+  color: var(--ink-3);
+}
+
+.prose a.video:hover { color: var(--red); }
+.prose a.video:hover .video-title { text-decoration-color: var(--red); }
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 @media (min-width: 960px) {
@@ -158,6 +224,12 @@
   .prose h2::before {
     min-width: 0;
     width: var(--margin-col);
+    margin-left: calc(-1 * var(--margin-col));
+  }
+
+  /* So does a video's play mark. */
+  .prose a.video {
+    grid-template-columns: var(--margin-col) minmax(0, 1fr);
     margin-left: calc(-1 * var(--margin-col));
   }
 }
