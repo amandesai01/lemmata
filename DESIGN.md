@@ -113,6 +113,7 @@ On a reading page the figure stands in a slim left column above the contents, fa
 - Caslon Display for the name and page titles, STIX Two for everything read; weight 400, roman and italic, with semibold kept for the heads of statements alone.
 - Numerals hang in a fixed 4rem margin column beside the text.
 - Square corners, no shadows, no gradients, no boxes or borders; a single hairline rule on the homepage.
+- One filled control, the Ultramarine action field, kept for the solving view's two actions.
 - One easing curve; the only extended motion is a true symmetry being performed. Pages change by a short crossfade with the name and a subject's title carried across, and the homepage inks in once on first load.
 
 ## Colors
@@ -120,7 +121,7 @@ On a reading page the figure stands in a slim left column above the contents, fa
 A full palette of four pigment inks, each with one job, on a single unvarying white ground, with two greys for reading and secondary text.
 
 ### Primary
-- **Ultramarine**: links: subject titles on the homepage, links inside reading text, and the keyboard focus ring. It is also the blue axis in figures, so a blue link reads as "go there".
+- **Ultramarine**: links: subject titles on the homepage, links inside reading text, and the keyboard focus ring. It is also the blue axis in figures, so a blue link reads as "go there". It fills the action field, the one filled control (see Components), with Plate White capitals on it.
 
 ### Secondary
 - **Vermilion**: response and position. Hover states on links turn vermilion. Section numerals, the current item in a contents or statements list, and the heads of definitions, results and examples (DEFINITION 1.1) are vermilion, so the reader can find each statement down the page. In figures it is the red axis and its vertex. On the homepage it names one part of the headword, the way Byrne names a part of a figure: the plural ending of LEMMA**TA** and the word "plural" in its definition share vermilion, while *lemma* stays black in both.
@@ -161,7 +162,9 @@ A full palette of four pigment inks, each with one job, on a single unvarying wh
 - **Body** (400, line-height 1.6, measure 34em, roughly 65 to 70 characters): all reading text. Mathematical variables are italic, and subscripts and superscripts are set at 0.72em.
 - **Body Small** (400, line-height 1.5): the homepage paragraph, figure captions, contents entries.
 - **Small** (400, line-height 1.5): subject descriptions under their titles.
-- **Note** (400 italic): figure readouts.
+- **Note** (400 italic): figure readouts, and the check sheet's status line.
+- **Question** (400, scales from 1.1875rem to 1.375rem, line-height 1.55): a question alone in the solving view, larger than the notes because it is the only thing on the page.
+- **Sheet heading** (400, 1.5rem, line-height 1.2): the heading of the check sheet, at the homepage Contents heading's size.
 - **Statement head** (600, 0.8125rem, tracked 0.12em, all capitals, Vermilion): the run-in head of a definition, result or example (THEOREM 3.3). The only semibold on the site.
 - **Label** (400, tracked 0.12 to 0.16em, all capitals): figure numbers (FIG. 1), fact labels (AREA), statement labels in the statements rail, area headings on the homepage (ABSTRACT ALGEBRA) and small section names (CONTENTS).
 - **Masthead** (Display, 400, tracked 0.12em, all capitals): the LEMMATA home link at the top of reading pages.
@@ -192,7 +195,8 @@ One curve, `cubic-bezier(0.16, 1, 0.3, 1)`. Nothing rises, bounces, lifts or sli
 
 - **Between pages:** the browser's cross-document view transition. The outgoing page fades in 160ms, the incoming one inks in over 320ms. Two parts travel instead of blinking (420ms): LEMMATA, between the homepage wordmark and the masthead, and a subject's title, between its homepage link and the heading of its notes. A shared part is marked `data-vt` with its name in `--vt`; the name and the title of a subject share `subject-<slug>`.
 - **Homepage entrance:** on first load only, the intro inks in (opacity, 520ms), the rule is drawn down the spine from the cap line (across the sheet on phones; 700ms, from 120ms), then the contents ink in (520ms, from 280ms). A page reached through a view transition skips it.
-- **Quick look:** opening, the sheet rises 14px and grows from 97% as it fades in (420ms), the backdrop pales and blurs (320ms), and the statement and its links ink in just after (from 90ms and 150ms). Closing, it sinks back 10px and fades in 200ms on an ease-in, `cubic-bezier(0.4, 0, 1, 1)`, since the house curve spends itself in the first frames and reads as a snap on the way out. With reduced motion it only fades (120ms).
+- **Solving view:** it inks in over 320ms like an incoming page and fades out in 160ms; a question chosen in place of another inks in over 320ms. With reduced motion it simply appears.
+- **Quick look and check sheet:** opening, the sheet rises 14px and grows from 97% as it fades in (420ms), the backdrop pales and blurs (320ms), and the statement and its links ink in just after (from 90ms and 150ms). Closing, it sinks back 10px and fades in 200ms on an ease-in, `cubic-bezier(0.4, 0, 1, 1)`, since the house curve spends itself in the first frames and reads as a snap on the way out. With reduced motion it only fades (120ms).
 - **Reduced motion:** shared parts lose their names, so pages simply crossfade; the rule appears by opacity instead of being drawn.
 
 ## Elevation & Depth
@@ -200,7 +204,7 @@ One curve, `cubic-bezier(0.16, 1, 0.3, 1)`. Nothing rises, bounces, lifts or sli
 The system is flat. There are no shadows, blurs, overlays or layered surfaces, except the quick look, which is the one thing that sits above the page. Depth is otherwise not part of the visual language. Hierarchy comes from ink strength, size and the margin column.
 
 ### Named Rules
-**The Flat Plate Rule.** Nothing on the page sits above anything else. Shadows, glows, gradients, blurs and tinted panels are never used. The quick look is the single exception: a square sheet of Plate White lifted off the page by a soft three-layer shadow in Lamp Black (6%, 8% and 16%), over a backdrop of 72% Plate White with a 3px blur. No other element may borrow it.
+**The Flat Plate Rule.** Nothing on the page sits above anything else. Shadows, glows, gradients, blurs and tinted panels are never used. The lifted sheet is the single exception: a square sheet of Plate White lifted off the page by a soft three-layer shadow in Lamp Black (6%, 8% and 16%), over a backdrop of 72% Plate White with a 3px blur (the shared `.sheet`). It is used by the quick look and the check sheet and by nothing else. The solving view is not lifted: it is a flat page laid over the notes.
 
 ## Shapes
 
@@ -211,7 +215,10 @@ Corners are square everywhere (0px). No boxes or borders are drawn anywhere. The
 
 ## Components
 
-Flat ink, exact response. At rest, controls read as printed matter. On interaction they change ink (to vermilion on hover) and make one small, exact movement, never a lift or a glow. There are no buttons or cards: navigation is by links.
+Flat ink, exact response. At rest, controls read as printed matter. On interaction they change ink (to vermilion on hover) and make one small, exact movement, never a lift or a glow. There are no cards, and navigation is by links. Controls that are not links are set as labels (CLOSE, SOLVE, PREVIOUS), with one exception, the action field.
+
+### Action Field
+The one filled control: a flat, square field of Ultramarine with its action in Plate White Label capitals (0.8125rem, tracked 0.14em) beside a drawn 1.25px line mark. On hover the field turns Vermilion (200ms). No border, radius or shadow. It is used for exactly two actions, CHECK YOUR SOLUTION in the solving view and COPY PROMPT in the check sheet, and never as a general button style.
 
 ### Subject List (signature component)
 Subjects on the homepage read like search results, with no box around them.
@@ -225,6 +232,11 @@ Subjects on the homepage read like search results, with no box around them.
 - **Contents rail:** on reading pages, a CONTENTS label, then numbered entries in Body Small Iron Gall with Pencil Grey numerals. The section currently being read turns Vermilion, numeral and title. On wide screens it sits in the figure rail, about a fifth of the width, beneath the figure, and sticks 2rem from the top. On phones it sits inline before the text.
 - **Statements rail:** on reading pages from 1280px, a STATEMENTS label, then every definition, result and example in order: its label (DEFINITION 1.1) in Pencil Grey Label capitals over its title in Iron Gall ("Lagrange’s theorem"), which wraps rather than being cut. Every statement in a note carries a title; the build fails without one. A little space opens where the section changes. The statement being read turns Lamp Black with a Vermilion label, and the rail scrolls itself to keep it in view. It sits in the right-hand column and sticks 2rem from the top, scrolling within the window's height, with no visible scrollbar. Choosing an entry opens the quick look.
 - **Quick look:** a dialog showing the chosen statement exactly as set on the page, with an Ultramarine "Go to Theorem 3.3" link that closes it and scrolls there, and a CLOSE label. It is a square sheet of Plate White with no border, lifted off the page by a soft shadow while the page behind pales and blurs (see Elevation & Depth); it rises into place and sinks away (see Motion). It closes on Escape or a click outside.
+
+### Questions and the Solving View
+Each section's notes end with a QUESTIONS label and its questions, numbered by section (3.1, 3.2, …) in the margin column, without solutions. At the right of the label, a SOLVE control (Pencil Grey label with a drawn mark of four corners, which opens out slightly on hover) opens the **solving view**: a flat Plate White page over the whole window. Its top line carries the QUESTIONS label, the section's Vermilion numeral and title, and CLOSE. One question stands alone in Question type, a little above the middle of the window, its numeral in the margin column, with the action field CHECK YOUR SOLUTION beneath. The foot carries PREVIOUS and NEXT at its ends and the section's question numerals between, the one being solved in Vermilion; on phones the numerals take their own row. The arrow keys step between questions, and Escape closes the view.
+
+**Check sheet.** CHECK YOUR SOLUTION opens a lifted sheet over the solving view, headed "Check your solution". Four numbered steps (Pencil Grey numerals) guide the reader: copy the prompt (the COPY PROMPT action field, with an italic status line beneath), open an AI assistant, photograph the written solution, paste the prompt. A READ THE PROMPT disclosure, with a drawn chevron that turns when open, shows the full prompt and falls back to a selection when the browser refuses the clipboard. The prompt carries the question, every statement it cites by number (in full), the question's `answer-ctx` checking notes and the notation, so any assistant can check the work standalone.
 
 ### Figure Plate (signature component)
 A true mathematical figure drawn in SVG with the four inks, followed by a caption opened by a FIG. numeral: in the margin column when the figure sits in a wide column, above the caption (at 0.9375rem) in the narrow figure rail. In interactive figures, phrases in the caption are buttons that perform the operation they name. Each has an inline glyph and a 2px underline in that axis's colour. The figure animates the actual symmetry (820ms, or 1100ms for two thirds of a turn) and an italic Pencil Grey readout states what moved. With reduced motion the figure changes state without animating.
@@ -247,8 +259,9 @@ A subject's area, set as a two-column list. The label is Pencil Grey Label capit
 ### Don't:
 - **Don't** set text in Chrome Yellow or lay text over it.
 - **Don't** use cream, tinted, grey or dark grounds.
-- **Don't** add shadows, gradients, blur or rounded corners to anything other than the quick look's shadow and backdrop blur; it never gets rounded corners either.
+- **Don't** add shadows, gradients, blur or rounded corners to anything other than the lifted sheet's shadow and backdrop blur (the quick look and the check sheet); it never gets rounded corners either.
 - **Don't** use cards, boxes or borders; a list of subjects is a list of plain linked entries, and the homepage's intro rule is the only rule.
+- **Don't** fill any control other than the two action fields; every other control is a label or a link.
 - **Don't** use bold, or any weight other than 400 outside statement heads.
 - **Don't** put a small label above a heading; heads run into the text instead.
-- **Don't** animate anything except a true symmetry, a control's direct response to the reader, or the page transitions, homepage entrance and quick look described under Motion.
+- **Don't** animate anything except a true symmetry, a control's direct response to the reader, or the page transitions, homepage entrance, solving view and lifted sheets described under Motion.

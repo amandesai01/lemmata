@@ -112,6 +112,24 @@
   font-style: normal;
 }
 
+/* A multiplication table: centred, ruled under its header row and after its first column. */
+.prose table {
+  margin: 1.25rem auto;
+  border-collapse: collapse;
+  font-style: normal;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.prose th,
+.prose td {
+  padding: 0.3rem 0.9rem;
+  text-align: center;
+  font-weight: 400;
+}
+
+.prose thead th { border-bottom: 1px solid var(--ink-3); }
+.prose tr > :first-child { border-right: 1px solid var(--ink-3); }
+
 .proof {
   margin-top: 1rem;
   color: var(--ink-2);
@@ -165,6 +183,49 @@
   text-transform: uppercase;
 }
 
+/* The head, and at the right of it the control that opens the solving view: a printed label whose
+   mark opens out a little when it is pointed at. */
+.questions-bar {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.questions-solve {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0.25rem 0;
+  border: 0;
+  background: none;
+  font-family: var(--face-text);
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+
+/* The mark is as tall as the capitals beside it. */
+.questions-solve-mark {
+  width: 0.75em;
+  height: 0.75em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+}
+
+.questions-solve:hover { color: var(--red); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .questions-solve-mark { transition: transform 240ms var(--ease-out); }
+  .questions-solve:hover .questions-solve-mark { transform: scale(1.18); }
+}
+
+.questions li.question > p { margin-top: 0; }
+.questions li.question > p + p { margin-top: 0.5rem; }
+
 /* The video a section follows: a play mark in the margin, its title as the link, and where it goes.
    It opens YouTube; nothing is embedded. */
 
@@ -210,6 +271,16 @@
 .prose a.video:hover { color: var(--red); }
 .prose a.video:hover .video-title { text-decoration-color: var(--red); }
 
+/* A control's label beside a drawn mark: its box is trimmed to the capitals, so a mark centred
+   beside it is centred on the letters rather than on the line, whose descender space would leave
+   the mark sitting low. Where trimming is not supported, the mark is lifted by the same amount. */
+.cap-text { text-box: trim-both cap alphabetic; }
+
+@supports not (text-box: trim-both cap alphabetic) {
+  .cap-text + svg,
+  svg:has(+ .cap-text) { translate: 0 -0.08em; }
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -231,5 +302,106 @@
   .prose a.video {
     grid-template-columns: var(--margin-col) minmax(0, 1fr);
     margin-left: calc(-1 * var(--margin-col));
+  }
+}
+
+/* A sheet lifted off the page: square, on the same paper, held up by a soft shadow in lamp-black
+   ink while the page behind blurs a little and pales. The one place the notes leave the flat plate:
+   the quick look of a statement, and the sheet that explains how to check a solution. */
+.sheet {
+  max-width: none;
+  max-height: calc(100svh - 4rem);
+  padding: 0;
+  border: 0;
+  background: var(--paper);
+  color: var(--ink);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  box-shadow:
+    0 1px 2px rgb(20 20 20 / 0.06),
+    0 6px 16px -4px rgb(20 20 20 / 0.08),
+    0 24px 56px -12px rgb(20 20 20 / 0.16);
+}
+
+/* The dialog takes focus itself when it opens, so no control is ringed before it is chosen. */
+.sheet:focus { outline: none; }
+
+.sheet::backdrop {
+  background: rgb(252 252 250 / 0.72);
+  backdrop-filter: blur(3px);
+}
+
+/* Opening, the sheet rises a little and settles as its shadow deepens, and the statement inks in
+   just after it; closing, it sinks back quickly. Transitions rather than keyframes, so closing
+   animates too: display and overlay are held until the sheet has gone. */
+@media (prefers-reduced-motion: no-preference) {
+  /* Closing: the house curve spends itself in the first frames, which reads as a snap, so the
+     exit accelerates away instead. */
+  .sheet {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+    transition:
+      opacity 200ms cubic-bezier(0.4, 0, 1, 1),
+      transform 200ms cubic-bezier(0.4, 0, 1, 1),
+      overlay 200ms allow-discrete,
+      display 200ms allow-discrete;
+  }
+
+  .sheet[open] {
+    opacity: 1;
+    transform: none;
+    transition-duration: 420ms;
+    transition-timing-function: var(--ease-out);
+  }
+
+  .sheet::backdrop {
+    opacity: 0;
+    transition:
+      opacity 200ms cubic-bezier(0.4, 0, 1, 1),
+      overlay 200ms allow-discrete,
+      display 200ms allow-discrete;
+  }
+
+  .sheet[open]::backdrop {
+    opacity: 1;
+    transition-duration: 320ms;
+    transition-timing-function: var(--ease-out);
+  }
+
+  .sheet[open] .sheet-body > * {
+    transition: opacity 360ms var(--ease-out) 90ms, transform 360ms var(--ease-out) 90ms;
+  }
+
+  .sheet[open] .sheet-body > :last-child { transition-delay: 150ms; }
+
+  @starting-style {
+    .sheet[open] {
+      opacity: 0;
+      transform: translateY(14px) scale(0.97);
+    }
+
+    .sheet[open]::backdrop { opacity: 0; }
+
+    .sheet[open] .sheet-body > * {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+}
+
+/* With reduced motion the sheet only fades. */
+@media (prefers-reduced-motion: reduce) {
+  .sheet,
+  .sheet::backdrop {
+    opacity: 0;
+    transition: opacity 120ms linear, overlay 120ms allow-discrete, display 120ms allow-discrete;
+  }
+
+  .sheet[open],
+  .sheet[open]::backdrop { opacity: 1; }
+
+  @starting-style {
+    .sheet[open],
+    .sheet[open]::backdrop { opacity: 0; }
   }
 }

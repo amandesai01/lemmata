@@ -10,7 +10,10 @@
 //   \{ \}          braces, escaped because MDX reads { } as code
 //   <Video id="…" title="…" duration="48:12" />
 //                  opens a section that follows a video; links out to YouTube, never embeds
-//   <Questions>    closes such a section: a numbered list of questions, without solutions
+//   <Questions>    closes such a section: <Question> items, without solutions
+//   <Question answer-ctx="…">
+//                  one question; answer-ctx, required and never shown, is the expected answer and
+//                  what to check, carried into the prompt an AI assistant checks the reader's work by
 import Definition from './Definition.astro';
 import Example from './Example.astro';
 import Proposition from './Proposition.astro';
@@ -22,6 +25,7 @@ import Display from './Display.astro';
 import Problems from './Problems.astro';
 import Video from './Video.astro';
 import Questions from './Questions.astro';
+import Question from './Question.astro';
 
 export const components = {
   strong: 'dfn',
@@ -36,4 +40,5 @@ export const components = {
   Problems,
   Video,
   Questions,
+  Question,
 };

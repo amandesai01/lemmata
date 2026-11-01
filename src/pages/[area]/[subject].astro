@@ -7,6 +7,7 @@ import { components } from '../../components/notes';
 import { figures } from '../../components/notes/figures';
 import { listStatements } from '../../components/notes/statements';
 import StatementPeek from '../../components/notes/StatementPeek.astro';
+import SolveView from '../../components/notes/SolveView.astro';
 import { catalog } from '../../data/catalog';
 import '../../styles/notes.css';
 
@@ -19,7 +20,7 @@ export async function getStaticPaths() {
 }
 
 const { note } = Astro.props;
-const { title, description, abstract, area, figure } = note.data;
+const { title, description, area, figure } = note.data;
 const { Content, headings } = await render(note);
 
 const sections = headings.filter((h) => h.depth === 2);
@@ -44,7 +45,6 @@ const opensSection = (i: number) => i > 0 && statements[i].n.split('.')[0] !== s
         <dt>Area</dt>
         <dd><a href={`/#${area}`}>{areaName}</a></dd>
       </dl>
-      <p class="abstract">{abstract}</p>
     </header>
 
     <nav class="contents" aria-labelledby="contents-heading">
@@ -83,6 +83,7 @@ const opensSection = (i: number) => i > 0 && statements[i].n.split('.')[0] !== s
   </main>
 
   <StatementPeek />
+  <SolveView />
 
   <Colophon />
 </Base>
@@ -194,14 +195,6 @@ const opensSection = (i: number) => i > 0 && statements[i].n.split('.')[0] !== s
   .facts dd { margin: 0; color: var(--ink); }
   .facts a { text-decoration-color: var(--ink-3); }
   .facts a:hover { color: var(--red); text-decoration-color: var(--red); }
-
-  .abstract {
-    margin-top: 1.75rem;
-    max-width: 34em;
-    font-size: clamp(1.125rem, 1.4vw, 1.25rem);
-    line-height: 1.5;
-    text-wrap: pretty;
-  }
 
   /* Contents */
 

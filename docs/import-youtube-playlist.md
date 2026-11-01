@@ -204,8 +204,13 @@ If *G* is finite and *H* ≤ *G*, then …
 </Proof>
 
 <Questions>
-1. Show that any two left cosets of *H* have the same number of elements.
-2. Find a group *G* and a subgroup *H* whose left and right cosets differ.
+<Question answer-ctx="Expected: the map h ↦ gh is a bijection from H to gH, with inverse x ↦ g^(−1)x, so every left coset has |H| elements. Check that both injectivity and surjectivity (or an explicit inverse) are shown.">
+Show that any two left cosets of *H* have the same number of elements.
+</Question>
+
+<Question answer-ctx="Expected: for example G = S_3 and H = {e, (1 2)}: the left coset (1 3)H differs from the right coset H(1 3). Any non-normal subgroup works. Check that one left coset is computed explicitly and shown to differ from the right coset with the same representative.">
+Find a group *G* and a subgroup *H* whose left and right cosets differ.
+</Question>
 </Questions>
 ```
 
@@ -275,8 +280,10 @@ impersonal voice of the existing note.
 
 ### 5.4 The questions
 
-Close every section with a `<Questions>` card, after the last of its notes. It holds a numbered
-Markdown list. The page numbers the items by section (3.1, 3.2, …).
+Close every section with a `<Questions>` card, after the last of its notes. It holds one
+`<Question>` per question, each with an `answer-ctx`. The page numbers the items by section (3.1, 3.2,
+…), and a SOLVE control lets the reader work through them one at a time and have an AI assistant
+check a photo of their written solution.
 
 - Each item is a question and nothing else: no solution, answer, hint or "(hint: …)", and no
   difficulty labels.
@@ -285,6 +292,23 @@ Markdown list. The page numbers the items by section (3.1, 3.2, …).
   hypothesis, compute an example, prove a stated result or a small consequence of it, find a
   counterexample. Aim for four to eight in all.
 - A question may draw on earlier sections, but never on anything the notes have not covered.
+- Refer to a statement by its number ("Proposition 5.6", "Example 1.3") whenever the question depends
+  on it. The prompt the reader copies quotes every statement cited this way in full.
+
+Every `<Question>` needs an `answer-ctx`, and the build fails without one. It is never shown on the page.
+It goes into the prompt an AI assistant uses to check the reader's solution, so write it for an
+examiner who has not read the notes:
+
+- **Expected:** the answer, and the steps a complete solution must contain, with values worked out.
+- **Check that:** the points to verify, such as a hypothesis used, a case not to skip, or a direction of
+  an equivalence.
+- **Common errors:** the usual wrong turns, such as composing in the wrong order or assuming
+  commutativity.
+- Any notation the question relies on that is not in a cited statement (for example, what *f*<sub>3</sub>
+  means and the order of composition).
+
+Write it in plain text with Unicode symbols, ^ for powers and _ for subscripts: `g^(−1)`, `S_3`. Use
+curly quotes (“ ”) inside it, never straight double quotes, since the value is itself quoted.
 
 ## Step 6. Finish the page
 
@@ -292,10 +316,10 @@ Markdown list. The page numbers the items by section (3.1, 3.2, …).
    `src/content/notes/<area>/<subject>.mdx`:
    - `title`: the subject's name.
    - `description`: one sentence for the meta description: "Lecture notes on …".
-   - `abstract`: two or three sentences, shown under the title, that state what the notes cover in
-     order. Write it last, from the finished sections.
    - `area`: the area's `id`.
    - `figure`: as settled in Step 1.5.
+
+   Write no summary or abstract of the page: it opens directly with its first section.
 2. **Catalog entry.** Add the subject to its area in `src/data/catalog.ts` with its `name`, a one-line
    `description` in the same style as the existing entry, its `figure` and its `href`
    (`/<area>/<subject>/`).

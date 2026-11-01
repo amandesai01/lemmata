@@ -11,8 +11,6 @@ const notes = defineCollection({
     title: z.string(),
     /** For the meta description. */
     description: z.string(),
-    /** Shown under the title. */
-    abstract: z.string(),
     area: z.enum(catalog.map((s) => s.id) as [string, ...string[]]),
     /** The figure that opens the notes, from src/components/notes/figures.ts. */
     figure: z.enum(['symmetry']),

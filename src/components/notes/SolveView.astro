@@ -1,0 +1,688 @@
+---
+// Solving a section's questions without distraction. The SOLVE control on a <Questions> card opens a
+// plain page over the notes, one question at a time. "Check your solution" opens a sheet that walks
+// the reader through having an AI assistant check a photo of their written work: it copies a prompt
+// holding the question, the statements it cites and the question's answer-ctx, so the assistant
+// needs nothing else.
+---
+
+<dialog class="solve" aria-labelledby="solve-heading" autofocus>
+  <div class="solve-frame">
+    <header class="solve-top">
+      <h2 id="solve-heading" class="solve-where">
+        <span class="solve-label">Questions</span>
+        <span class="solve-section"><span class="solve-section-n" data-solve-section-n></span><span data-solve-section-title></span></span>
+      </h2>
+      <button type="button" class="solve-label solve-close" data-solve-close>Close</button>
+    </header>
+
+    <div class="solve-main">
+      <div class="solve-question" data-solve-question>
+        <span class="solve-n" data-solve-n></span>
+        <div class="solve-text prose" data-solve-text></div>
+      </div>
+      <button type="button" class="solve-check" data-solve-check aria-haspopup="dialog">
+        <svg viewBox="0 0 16 16" aria-hidden="true">
+          <path d="M1.5 4.75h3.25l1.25-2h4l1.25 2h3.25v8.5h-13z" />
+          <circle cx="8" cy="8.75" r="2.6" />
+        </svg>
+        <span class="cap-text">Check your solution</span>
+      </button>
+    </div>
+
+    <nav class="solve-nav" aria-label="Questions in this section">
+      <button type="button" class="solve-label solve-step" data-solve-prev>
+        <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M7.5 2 3.5 6l4 4" /></svg>
+        <span class="cap-text">Previous</span>
+      </button>
+      <ol class="solve-list" data-solve-list></ol>
+      <button type="button" class="solve-label solve-step" data-solve-next>
+        <span class="cap-text">Next</span>
+        <svg viewBox="0 0 12 12" aria-hidden="true"><path d="m4.5 2 4 4-4 4" /></svg>
+      </button>
+    </nav>
+  </div>
+</dialog>
+
+<dialog class="check sheet" closedby="any" aria-labelledby="check-heading" autofocus>
+  <div class="check-body sheet-body">
+    <h2 id="check-heading" class="check-heading">Check your solution</h2>
+    <p class="check-lede">
+      An AI assistant can read a photo of your written work and check it. The prompt carries
+      Question <span data-check-n></span>, the statements it cites and what a complete answer must
+      contain, so the assistant needs nothing else.
+    </p>
+
+    <ol class="check-steps">
+      <li>
+        <div>
+          <p>Copy the prompt.</p>
+          <button type="button" class="solve-check check-copy" data-check-copy>
+            <svg viewBox="0 0 16 16" aria-hidden="true">
+              <path d="M5.5 5.5h8v8.5h-8z" />
+              <path d="M10.5 5.5V2h-8v8.5h3" />
+            </svg>
+            <span class="cap-text" data-check-copy-label>Copy prompt</span>
+          </button>
+          <p class="check-status" role="status" data-check-status></p>
+        </div>
+      </li>
+      <li><p>Open an AI assistant, such as ChatGPT, Claude or Gemini, and start a new chat.</p></li>
+      <li><p>Take a clear photo of your written solution and attach it to the message.</p></li>
+      <li><p>Paste the prompt and send it.</p></li>
+    </ol>
+
+    <details class="check-prompt" data-check-details>
+      <summary>
+        <svg viewBox="0 0 12 12" aria-hidden="true"><path d="m4.5 2 4 4-4 4" /></svg>
+        <span class="cap-text">Read the prompt</span>
+      </summary>
+      <pre data-check-prompt></pre>
+    </details>
+
+    <p class="check-actions">
+      <button type="button" class="solve-label" data-check-close>Close</button>
+    </p>
+  </div>
+</dialog>
+
+<script>
+  const solve = document.querySelector<HTMLDialogElement>('dialog.solve')!;
+  const check = document.querySelector<HTMLDialogElement>('dialog.check')!;
+  const $ = <T extends Element>(root: Element, attr: string) => root.querySelector<T>(`[${attr}]`)!;
+
+  const sectionN = $<HTMLElement>(solve, 'data-solve-section-n');
+  const sectionTitle = $<HTMLElement>(solve, 'data-solve-section-title');
+  const questionBox = $<HTMLElement>(solve, 'data-solve-question');
+  const numeral = $<HTMLElement>(solve, 'data-solve-n');
+  const text = $<HTMLElement>(solve, 'data-solve-text');
+  const list = $<HTMLOListElement>(solve, 'data-solve-list');
+  const prev = $<HTMLButtonElement>(solve, 'data-solve-prev');
+  const next = $<HTMLButtonElement>(solve, 'data-solve-next');
+
+  const checkN = $<HTMLElement>(check, 'data-check-n');
+  const copyButton = $<HTMLButtonElement>(check, 'data-check-copy');
+  const copyLabel = $<HTMLElement>(check, 'data-check-copy-label');
+  const status = $<HTMLElement>(check, 'data-check-status');
+  const details = $<HTMLDetailsElement>(check, 'data-check-details');
+  const promptBox = $<HTMLElement>(check, 'data-check-prompt');
+
+  const still = matchMedia('(prefers-reduced-motion: reduce)');
+
+  interface Question {
+    n: string;
+    item: HTMLLIElement;
+  }
+
+  let section = { n: '', title: '' };
+  let questions: Question[] = [];
+  let at = 0;
+  let prompt = '';
+
+  // ——— Opening the solving view ———
+
+  document.addEventListener('click', (e) => {
+    const control = (e.target as Element).closest('[data-solve]');
+    const card = control?.closest<HTMLElement>('.questions');
+    if (card) open(card);
+  });
+
+  function open(card: HTMLElement) {
+    // The section is the nearest heading before the card; its numeral is its place among the headings.
+    let heading = card.previousElementSibling;
+    while (heading && heading.tagName !== 'H2') heading = heading.previousElementSibling;
+    const headings = [...(card.parentElement?.querySelectorAll(':scope > h2') ?? [])];
+    section = { n: String(headings.indexOf(heading!) + 1), title: heading?.textContent?.trim() ?? '' };
+    sectionN.textContent = section.n;
+    sectionTitle.textContent = section.title;
+
+    const items = [...card.querySelectorAll<HTMLLIElement>(':scope > ol > li.question')];
+    questions = items.map((item, i) => ({ n: `${section.n}.${i + 1}`, item }));
+
+    list.replaceChildren(
+      ...questions.map((q, i) => {
+        const li = document.createElement('li');
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.textContent = q.n;
+        b.setAttribute('aria-label', `Question ${q.n}`);
+        b.addEventListener('click', () => show(i));
+        li.append(b);
+        return li;
+      }),
+    );
+
+    show(0, false);
+    solve.showModal();
+  }
+
+  let turn = 0;
+
+  function show(i: number, animate = true) {
+    if (i < 0 || i >= questions.length) return;
+    at = i;
+    const q = questions[i];
+
+    // The controls answer at once; the question itself is changed over in show's own time.
+    list.querySelectorAll('button').forEach((b, j) => {
+      if (j === i) b.setAttribute('aria-current', 'step');
+      else b.removeAttribute('aria-current');
+    });
+    prev.disabled = i === 0;
+    next.disabled = i === questions.length - 1;
+
+    const mine = ++turn;
+    if (!animate || still.matches) {
+      setQuestion(q);
+      return;
+    }
+
+    // The question being left fades quickly, then the next inks in, as a page does. A newer choice
+    // made meanwhile takes over from wherever the fade has reached.
+    const from = getComputedStyle(questionBox).opacity;
+    const out = questionBox.animate([{ opacity: from }, { opacity: 0 }], {
+      duration: 140,
+      easing: 'cubic-bezier(0.4, 0, 1, 1)',
+      fill: 'forwards',
+    });
+    out.finished
+      .then(() => {
+        if (mine !== turn) {
+          out.cancel();
+          return;
+        }
+        setQuestion(q);
+        questionBox.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 380, easing: 'cubic-bezier(0.16, 1, 0.3, 1)' });
+        out.cancel();
+      })
+      .catch(() => {});
+  }
+
+  function setQuestion(q: Question) {
+    numeral.textContent = q.n;
+    const copy = [...q.item.childNodes].map((node) => node.cloneNode(true));
+    copy.forEach((node) => node instanceof Element && node.querySelectorAll('[id]').forEach((el) => el.removeAttribute('id')));
+    text.replaceChildren(...copy);
+    questionBox.setAttribute('aria-label', `Question ${q.n}`);
+  }
+
+  prev.addEventListener('click', () => show(at - 1));
+  next.addEventListener('click', () => show(at + 1));
+  $(solve, 'data-solve-close').addEventListener('click', () => solve.close());
+
+  solve.addEventListener('keydown', (e) => {
+    if (check.open || e.altKey || e.ctrlKey || e.metaKey) return;
+    if (e.key === 'ArrowRight') show(at + 1);
+    else if (e.key === 'ArrowLeft') show(at - 1);
+  });
+
+  // ——— The prompt ———
+
+  // Plain text for an assistant: superscripts and subscripts become ^ and _, lists keep their
+  // markers, and a statement keeps its head.
+  const roman = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii', 'ix', 'x'];
+  const group = (s: string) => (/^[\p{L}\p{N}]$/u.test(s) ? s : `(${s})`);
+
+  function plain(node: Node): string {
+    if (node.nodeType === Node.TEXT_NODE) return (node.textContent ?? '').replace(/\s+/g, ' ');
+    if (!(node instanceof HTMLElement)) return '';
+    const inner = () => [...node.childNodes].map(plain).join('');
+    switch (node.tagName) {
+      case 'SUP':
+        return `^${group(inner().trim())}`;
+      case 'SUB':
+        return `_${group(inner().trim())}`;
+      case 'BR':
+        return '\n';
+      case 'OL':
+        return `\n${[...node.children].map((li, i) => `(${roman[i] ?? i + 1}) ${tidy(plain(li))}`).join('\n')}\n`;
+      case 'TR':
+        return `\n${[...node.children].map((cell) => tidy(plain(cell)) || ' ').join(' | ')}`;
+      case 'P':
+      case 'DIV':
+      case 'LI':
+      case 'TABLE':
+        return `\n${inner().trim()}\n`;
+      default:
+        return inner();
+    }
+  }
+
+  const tidy = (s: string) =>
+    s
+      .split('\n')
+      .map((line) => line.replace(/[ \t]+/g, ' ').trim())
+      .join('\n')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+
+  function statementText(el: HTMLElement) {
+    const head = el.querySelector('.env-head')?.textContent?.trim() ?? '';
+    const name = el.querySelector('.env-name')?.textContent?.trim();
+    const body = el.cloneNode(true) as HTMLElement;
+    body.querySelectorAll('.env-head, .env-name').forEach((n) => n.remove());
+    return `${head}${name ? ` ${name}` : '.'} ${tidy(plain(body))}`;
+  }
+
+  function buildPrompt(q: Question) {
+    const subject = document.querySelector('h1')?.textContent?.trim() ?? '';
+    const question = tidy(plain(q.item));
+
+    // Statements the question cites by number, set out in full so the assistant has them.
+    const cited = [...question.matchAll(/\b(Definition|Example|Proposition|Lemma|Theorem|Corollary) (\d+\.\d+)/g)]
+      .map(([, kind, n]) => document.getElementById(`${kind.toLowerCase()}-${n.replaceAll('.', '-')}`))
+      .filter((el, i, all): el is HTMLElement => !!el && all.indexOf(el) === i)
+      .map(statementText);
+
+    return [
+      `I am studying ${subject.toLowerCase()} on my own and have written a solution to the question below. A photo of my handwritten solution is attached.`,
+      [
+        'Please check my solution as a careful examiner would:',
+        '- First say whether it is correct and complete.',
+        '- If it is not, point to the first step that is wrong, unjustified or missing, quote it, and explain the problem.',
+        '- Accept any valid approach, even one that differs from the checking notes below.',
+        '- Do not write out a full solution, and do not reveal points I have not reached, unless I ask.',
+        '- If part of the photo is hard to read, say which part instead of guessing.',
+      ].join('\n'),
+      `Subject: ${subject}\nSection ${section.n}: ${section.title}`,
+      `Question ${q.n}\n${question}`,
+      cited.length ? `Statements the question cites, as given in my notes:\n${cited.join('\n\n')}` : '',
+      `Checking notes (for you; do not quote them back in full):\n${q.item.dataset.answerCtx ?? ''}`,
+      'Notation: a product ab is the group operation applied to a and b; e is the identity; x^n is a power and x^(−1) an inverse; x_n is a subscript; ℤ, ℚ, ℝ and ℂ are the integers, rationals, reals and complex numbers.',
+    ]
+      .filter(Boolean)
+      .join('\n\n');
+  }
+
+  // ——— The check sheet ———
+
+  $(solve, 'data-solve-check').addEventListener('click', () => {
+    const q = questions[at];
+    prompt = buildPrompt(q);
+    checkN.textContent = q.n;
+    promptBox.textContent = prompt;
+    copyLabel.textContent = 'Copy prompt';
+    status.textContent = '';
+    details.open = false;
+    check.showModal();
+  });
+
+  async function copyText(value: string) {
+    try {
+      await navigator.clipboard.writeText(value);
+      return true;
+    } catch {
+      // Where the clipboard API is refused, fall back to a selection the browser copies itself.
+      const area = document.createElement('textarea');
+      area.value = value;
+      area.setAttribute('readonly', '');
+      area.style.cssText = 'position:fixed;inset:0 auto auto 0;opacity:0';
+      check.append(area);
+      area.select();
+      let done = false;
+      try {
+        done = document.execCommand('copy');
+      } catch {
+        done = false;
+      }
+      area.remove();
+      return done;
+    }
+  }
+
+  copyButton.addEventListener('click', async () => {
+    if (await copyText(prompt)) {
+      copyLabel.textContent = 'Copied';
+      status.textContent = 'The prompt is on your clipboard. Now open an AI assistant.';
+    } else {
+      details.open = true;
+      getSelection()?.selectAllChildren(promptBox);
+      status.textContent = 'Your browser did not allow copying. The prompt is selected below: copy it from there.';
+    }
+  });
+
+  $(check, 'data-check-close').addEventListener('click', () => check.close());
+  // Clicking outside the sheet closes it, where closedby="any" is not supported.
+  check.addEventListener('click', (e) => {
+    if (e.target === check) check.close();
+  });
+</script>
+
+<style>
+  /* ——— The solving view: a plain page laid over the notes, flat like every page. ——— */
+
+  .solve {
+    width: 100vw;
+    height: 100dvh;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: var(--paper);
+    color: var(--ink);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .solve::backdrop { background: var(--paper); }
+  .solve:focus { outline: none; }
+
+  :global(html:has(dialog.solve[open])) { overflow: hidden; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .solve {
+      opacity: 0;
+      transition:
+        opacity 160ms cubic-bezier(0.4, 0, 1, 1),
+        overlay 160ms allow-discrete,
+        display 160ms allow-discrete;
+    }
+
+    .solve[open] {
+      opacity: 1;
+      transition-duration: 320ms;
+      transition-timing-function: var(--ease-out);
+    }
+
+    /* Opening, the plain page comes first, then its parts ink in one after another: where you
+       are, the question, what you can do with it, and the way to the others. */
+    .solve[open] :is(.solve-top, .solve-question, .solve-check, .solve-nav) {
+      transition: opacity 520ms var(--ease-out);
+    }
+
+    .solve[open] .solve-top { transition-delay: 80ms; }
+    .solve[open] .solve-question { transition-delay: 160ms; }
+    .solve[open] .solve-check {
+      transition:
+        opacity 520ms var(--ease-out) 280ms,
+        background-color 200ms var(--ease-out);
+    }
+    .solve[open] .solve-nav { transition-delay: 340ms; }
+
+    @starting-style {
+      .solve[open] { opacity: 0; }
+      .solve[open] :is(.solve-top, .solve-question, .solve-check, .solve-nav) { opacity: 0; }
+    }
+  }
+
+  .solve-frame {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    min-height: 100%;
+    max-width: 100rem;
+    margin: 0 auto;
+    padding: clamp(1rem, 3.5vh, 2rem) var(--gutter);
+  }
+
+  .solve-top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+
+  .solve-where {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.35rem 1.25rem;
+    font-weight: 400;
+    font-size: 1rem;
+    line-height: 1.4;
+    color: var(--ink-2);
+  }
+
+  /* The section's numeral hangs, so a long title wraps beside it rather than under it. */
+  .solve-section { display: flex; }
+
+  .solve-section-n {
+    flex: none;
+    min-width: 1.5em;
+    color: var(--red);
+    font-variant-numeric: lining-nums;
+  }
+
+  /* Labels and the controls set as labels: CLOSE, PREVIOUS, NEXT. */
+  .solve-label {
+    padding: 0;
+    border: 0;
+    background: none;
+    font-family: var(--face-text);
+    font-size: 0.8125rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  button.solve-label { cursor: pointer; }
+  button.solve-label:hover:not(:disabled) { color: var(--red); }
+  .solve-close { flex: none; padding-block: 0.5rem; }
+
+  /* The question stands alone, larger than the notes, a little above the middle of the window. */
+  .solve-main {
+    align-self: start;
+    width: 100%;
+    max-width: calc(36em + var(--margin-col));
+    margin: 0 auto;
+    padding-block: clamp(3rem, 16vh, 9rem) 3rem;
+  }
+
+  .solve-question {
+    display: grid;
+    grid-template-columns: var(--margin-col) minmax(0, 1fr);
+    align-items: baseline;
+  }
+
+  .solve-n {
+    font-family: var(--face-text);
+    font-size: 1rem;
+    font-variant-numeric: lining-nums;
+    color: var(--ink-3);
+  }
+
+  .solve-text {
+    max-width: none;
+    font-size: clamp(1.1875rem, 1.6vw, 1.375rem);
+    line-height: 1.55;
+  }
+
+  .solve-text :global(p) { margin: 0; }
+  .solve-text :global(p + p) { margin-top: 0.75rem; }
+
+  /* The one filled control: a flat field of ultramarine, square, which turns vermilion when pointed
+     at. Here it opens the check sheet; in the sheet, it copies the prompt. */
+  .solve-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: clamp(2.5rem, 6vh, 3.5rem);
+    margin-left: var(--margin-col);
+    padding: 1rem 1.35rem 1rem 1.15rem;
+    border: 0;
+    background: var(--blue);
+    color: var(--paper);
+    font-family: var(--face-text);
+    font-size: 0.8125rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 200ms var(--ease-out);
+  }
+
+  .solve-check:hover { background: var(--red); }
+
+  .solve-check svg {
+    width: 1.0625rem;
+    height: 1.0625rem;
+    flex: none;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.25;
+  }
+
+  /* Moving between questions: PREVIOUS and NEXT at the ends, the questions' numerals between,
+     the one being solved in vermilion. */
+  .solve-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .solve-step {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+  }
+
+  .solve-step svg {
+    width: 0.75rem;
+    height: 0.75rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.4;
+  }
+
+  .solve-step:disabled { opacity: 0; pointer-events: none; }
+
+  .solve-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 0;
+    list-style: none;
+  }
+
+  .solve-list :global(button) {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    padding: 0 0.35rem;
+    border: 0;
+    background: none;
+    font-family: var(--face-text);
+    font-size: 0.9375rem;
+    font-variant-numeric: lining-nums tabular-nums;
+    color: var(--ink-3);
+    cursor: pointer;
+  }
+
+  .solve-list :global(button:hover) { color: var(--red); }
+  .solve-list :global(button[aria-current]) { color: var(--red); }
+
+  @media (max-width: 599px) {
+    .solve-question { grid-template-columns: 2.75rem minmax(0, 1fr); }
+    .solve-check { margin-left: 2.75rem; }
+    /* On a phone the numerals take a row of their own, with the two steps beneath at its ends. */
+    .solve-nav {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      row-gap: 0.25rem;
+    }
+
+    .solve-list { grid-column: 1 / -1; grid-row: 1; }
+    .solve-step { grid-row: 2; justify-self: start; }
+    .solve-step[data-solve-next] { justify-self: end; }
+    .solve-list :global(button) { min-width: 2.375rem; padding: 0; }
+    .solve-step svg { width: 0.875rem; height: 0.875rem; }
+  }
+
+  /* ——— The check sheet, lifted off the solving view like the quick look. ——— */
+
+  .check { width: min(36rem, calc(100vw - 2rem)); }
+
+  .check-body { padding: clamp(1.5rem, 4vw, 2.5rem) clamp(1rem, 4vw, 2.5rem); }
+
+  .check-heading {
+    font-family: var(--face-text);
+    font-weight: 400;
+    font-size: 1.5rem;
+    line-height: 1.2;
+  }
+
+  .check-lede {
+    margin-top: 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--ink-2);
+    text-wrap: pretty;
+  }
+
+  .check-steps {
+    counter-reset: step;
+    margin-top: 1.5rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  .check-steps > li {
+    counter-increment: step;
+    display: grid;
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    margin-top: 1rem;
+    font-size: 1.0625rem;
+    line-height: 1.5;
+  }
+
+  .check-steps > li::before {
+    content: counter(step);
+    font-variant-numeric: lining-nums;
+    color: var(--ink-3);
+  }
+
+  .check-copy { margin: 0.85rem 0 0; }
+
+  .check-status {
+    min-height: 1.5em;
+    margin-top: 0.5rem;
+    font-size: 0.9375rem;
+    font-style: italic;
+    color: var(--ink-3);
+  }
+
+  .check-prompt { margin-top: 1.5rem; }
+
+  .check-prompt summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    list-style: none;
+    font-size: 0.8125rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    cursor: pointer;
+  }
+
+  .check-prompt summary::-webkit-details-marker { display: none; }
+  .check-prompt summary:hover { color: var(--red); }
+
+  .check-prompt summary svg {
+    width: 0.625rem;
+    height: 0.625rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    transition: transform 240ms var(--ease-out);
+  }
+
+  .check-prompt[open] summary svg { transform: rotate(90deg); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .check-prompt summary svg { transition: none; }
+  }
+
+  .check-prompt pre {
+    max-height: 16rem;
+    margin: 0.75rem 0 0;
+    overflow: auto;
+    white-space: pre-wrap;
+    font-family: var(--face-math);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+
+  .check-actions { margin-top: 1.75rem; }
+</style>

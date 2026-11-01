@@ -1,0 +1,14 @@
+---
+// One question in a <Questions> card. Its answer-ctx is never shown on the page: it is what a
+// correct answer contains and what to check, and it goes into the prompt the reader copies to have
+// an AI assistant check their written solution (see SolveView.astro).
+interface Props {
+  /** Required. The expected answer and the points a checker should look for, with the usual pitfalls. */
+  'answer-ctx': string;
+}
+
+const ctx = Astro.props['answer-ctx'];
+if (!ctx?.trim()) throw new Error('Every <Question> needs an answer-ctx, as in <Question answer-ctx="…">.');
+---
+
+<li class="question" data-answer-ctx={ctx.trim()}><slot /></li>

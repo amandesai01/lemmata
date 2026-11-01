@@ -3,8 +3,8 @@
 // opens it, showing the statement as set on the page, with a link to go there.
 ---
 
-<dialog class="peek" closedby="any" autofocus>
-  <div class="peek-body">
+<dialog class="peek sheet" closedby="any" autofocus>
+  <div class="peek-body sheet-body">
     <div class="prose" data-peek-content></div>
     <p class="peek-actions">
       <a href="#" data-peek-go>Go to <span data-peek-label></span></a>
@@ -52,30 +52,10 @@
 </script>
 
 <style>
-  /* A sheet lifted off the page: square, on the same paper, held up by a soft shadow in lamp-black
-     ink while the page behind blurs a little and pales. The one place the notes leave the flat plate. */
+  /* The sheet itself (paper, shadow, backdrop and motion) is the shared .sheet in notes.css. */
   .peek {
     width: min(40rem, calc(100vw - 2rem));
-    max-width: none;
     max-height: calc(100svh - 4rem);
-    padding: 0;
-    border: 0;
-    background: var(--paper);
-    color: var(--ink);
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    box-shadow:
-      0 1px 2px rgb(20 20 20 / 0.06),
-      0 6px 16px -4px rgb(20 20 20 / 0.08),
-      0 24px 56px -12px rgb(20 20 20 / 0.16);
-  }
-
-  /* The dialog takes focus itself when it opens, so no control is ringed before it is chosen. */
-  .peek:focus { outline: none; }
-
-  .peek::backdrop {
-    background: rgb(252 252 250 / 0.72);
-    backdrop-filter: blur(3px);
   }
 
   .peek-body { padding: clamp(1.5rem, 4vw, 2.5rem) clamp(1rem, 4vw, 2.5rem); }
@@ -113,78 +93,4 @@
 
   .peek-actions button:hover { color: var(--red); }
 
-  /* Opening, the sheet rises a little and settles as its shadow deepens, and the statement inks in
-     just after it; closing, it sinks back quickly. Transitions rather than keyframes, so closing
-     animates too: display and overlay are held until the sheet has gone. */
-  @media (prefers-reduced-motion: no-preference) {
-    /* Closing: the house curve spends itself in the first frames, which reads as a snap, so the
-       exit accelerates away instead. */
-    .peek {
-      opacity: 0;
-      transform: translateY(10px) scale(0.98);
-      transition:
-        opacity 200ms cubic-bezier(0.4, 0, 1, 1),
-        transform 200ms cubic-bezier(0.4, 0, 1, 1),
-        overlay 200ms allow-discrete,
-        display 200ms allow-discrete;
-    }
-
-    .peek[open] {
-      opacity: 1;
-      transform: none;
-      transition-duration: 420ms;
-      transition-timing-function: var(--ease-out);
-    }
-
-    .peek::backdrop {
-      opacity: 0;
-      transition:
-        opacity 200ms cubic-bezier(0.4, 0, 1, 1),
-        overlay 200ms allow-discrete,
-        display 200ms allow-discrete;
-    }
-
-    .peek[open]::backdrop {
-      opacity: 1;
-      transition-duration: 320ms;
-      transition-timing-function: var(--ease-out);
-    }
-
-    .peek[open] .peek-body > * {
-      transition: opacity 360ms var(--ease-out) 90ms, transform 360ms var(--ease-out) 90ms;
-    }
-
-    .peek[open] .peek-body > :last-child { transition-delay: 150ms; }
-
-    @starting-style {
-      .peek[open] {
-        opacity: 0;
-        transform: translateY(14px) scale(0.97);
-      }
-
-      .peek[open]::backdrop { opacity: 0; }
-
-      .peek[open] .peek-body > * {
-        opacity: 0;
-        transform: translateY(6px);
-      }
-    }
-  }
-
-  /* With reduced motion the sheet only fades. */
-  @media (prefers-reduced-motion: reduce) {
-    .peek,
-    .peek::backdrop {
-      opacity: 0;
-      transition: opacity 120ms linear, overlay 120ms allow-discrete, display 120ms allow-discrete;
-    }
-
-    .peek[open],
-    .peek[open]::backdrop { opacity: 1; }
-
-    @starting-style {
-      .peek[open],
-      .peek[open]::backdrop { opacity: 0; }
-    }
-  }
 </style>

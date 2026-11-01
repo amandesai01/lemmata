@@ -1,9 +1,20 @@
 ---
-// Questions on a section, set at its end: a numbered list of questions alone, with no hints or
-// solutions, numbered by section as problems are: 3.1, 3.2, …
+// Questions on a section, set at its end: <Question> items alone, with no hints or solutions,
+// numbered by section as problems are: 3.1, 3.2, … The control beside the head opens them one at a
+// time in the solving view (SolveView.astro).
 ---
 
 <div class="questions">
-  <h3 class="questions-head">Questions</h3>
-  <slot />
+  <div class="questions-bar">
+    <h3 class="questions-head">Questions</h3>
+    <button type="button" class="questions-solve" data-solve aria-haspopup="dialog">
+      <svg class="questions-solve-mark" viewBox="0 0 12 12" aria-hidden="true">
+        <path d="M1 4.5V1h3.5M7.5 1H11v3.5M11 7.5V11H7.5M4.5 11H1V7.5" />
+      </svg>
+      <span class="cap-text">Solve</span><span class="visually-hidden"> these questions one at a time</span>
+    </button>
+  </div>
+  <ol>
+    <slot />
+  </ol>
 </div>

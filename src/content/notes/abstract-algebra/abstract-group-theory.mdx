@@ -1,232 +1,850 @@
 ---
 title: Abstract Group Theory
-description: Lecture notes on abstract group theory, from the axioms to the Sylow theorems.
-abstract: >-
-  Groups from the axioms: subgroups and cosets, Lagrange’s theorem, normal subgroups and quotients,
-  homomorphisms, group actions and the Sylow theorems, with problems at the end.
+description: Lecture notes on abstract group theory, from motivating examples to the axioms and the first properties of groups.
 area: abstract-algebra
 figure: symmetry
 ---
 
-## Groups
+## Three motivating examples
 
-A group is the algebraic record of symmetry. Whenever a collection of transformations can be composed,
-undone, and contains the transformation that does nothing, the collection is a group, and its
-properties can be studied without reference to what is being transformed.
+<Video id="PN-cro0J_v8" title="Motivational examples of groups" duration="37:59" />
 
-<Definition n="1.1" title="Group">
-A **group** is a set *G* with a binary operation (*g*, *h*) ↦ *gh* satisfying three axioms:
+Groups are algebraic objects that abstract certain features shared by familiar mathematical objects.
+Each of the following three examples is a set together with a way of combining two of its elements
+into a third, and in each the same four properties of that combination appear.
 
-1. *associativity:* (*gh*)*k* = *g*(*hk*) for all *g*, *h*, *k* ∈ *G*;
-2. *identity:* there is *e* ∈ *G* with *eg* = *ge* = *g* for all *g* ∈ *G*;
-3. *inverses:* each *g* ∈ *G* has some *g*<sup>−1</sup> ∈ *G* with *gg*<sup>−1</sup> = *g*<sup>−1</sup>*g* = *e*.
+<Example n="1.1" title="The integers under addition">
+Let ℤ = \{…, −2, −1, 0, 1, 2, …\} be the set of integers, with addition. Addition has four properties.
+
+1. *Closure:* the sum of two integers is an integer. Addition takes two integers as input and gives one
+   integer as output, so it is a binary operation on ℤ.
+2. *Identity:* *n* + 0 = 0 + *n* = *n* for every integer *n*, and 0 is the only integer with this
+   property. It is the identity element for addition.
+3. *Inverses:* every integer *n* has an inverse −*n*, with *n* + (−*n*) = 0.
+4. *Associativity:* (*l* + *m*) + *n* = *l* + (*m* + *n*) for all integers *l*, *m*, *n*. A sum of three
+   integers therefore has one value however its terms are grouped: (3 + 2) + 5 = 5 + 5 = 10 and
+   3 + (2 + 5) = 3 + 7 = 10.
+
+Addition has a fifth property, *m* + *n* = *n* + *m*, but it is not among those kept.
+</Example>
+
+These properties are not automatic. Under multiplication, ℤ has no inverses: the only number whose
+product with 2 is 1 is 1/2, which is not an integer.
+
+<Definition n="1.2" title="Bijection">
+A function *f* : *X* → *Y* is **one-to-one** if distinct elements of *X* have distinct images, and
+**onto** if every element of *Y* is the image of some element of *X*. It is a **bijection** if it is
+both one-to-one and onto.
 </Definition>
 
-If in addition *gh* = *hg* for all *g*, *h* ∈ *G*, the group is **abelian**. The number of elements of
-*G* is its **order**, written |*G*|.
+Let *S*<sub>3</sub> be the set of all bijections from \{1, 2, 3\} to itself. Nothing about 1, 2 and 3
+is used except that they are three distinct elements.
 
-<Example n="1.2" title="Groups of numbers, permutations and matrices">
-The integers ℤ under addition; the residues ℤ/*n*ℤ under addition modulo *n*; the non-zero rationals
-under multiplication; the symmetric group *S*<sub>*n*</sub> of all permutations of \{1, …, *n*\} under
-composition, of order *n*!; and the invertible *n* × *n* real matrices GL<sub>*n*</sub>(ℝ) under matrix
+<Example n="1.3" title="The six bijections of a three-element set">
+The elements of *S*<sub>3</sub> are the following six functions.
+
+1. *f*<sub>1</sub> : 1 ↦ 1, 2 ↦ 2, 3 ↦ 3, the identity function;
+2. *f*<sub>2</sub> : 1 ↦ 2, 2 ↦ 1, 3 ↦ 3, which interchanges 1 and 2;
+3. *f*<sub>3</sub> : 1 ↦ 3, 2 ↦ 2, 3 ↦ 1, which interchanges 1 and 3;
+4. *f*<sub>4</sub> : 1 ↦ 1, 2 ↦ 3, 3 ↦ 2, which interchanges 2 and 3;
+5. *f*<sub>5</sub> : 1 ↦ 2, 2 ↦ 3, 3 ↦ 1;
+6. *f*<sub>6</sub> : 1 ↦ 3, 2 ↦ 1, 3 ↦ 2.
+
+There are no others. A bijection that fixes one of 1, 2, 3 either fixes the other two as well or
+interchanges them, so it is one of *f*<sub>1</sub>, …, *f*<sub>4</sub>. A bijection *f* that fixes
+nothing sends 1 to 2 or to 3. If *f*(1) = 2, then *f*(2) = 3, since *f*(2) = 1 would force *f*(3) = 3;
+so *f* = *f*<sub>5</sub>. In the same way *f*(1) = 3 gives *f* = *f*<sub>6</sub>.
+</Example>
+
+The operation on *S*<sub>3</sub> is composition of functions. Since domain and codomain are the same,
+any two elements can be composed. The composite *f* ∘ *g* applies *g* first and then *f*, and is
+written *fg*.
+
+<Example n="1.4" title="The order of composition matters">
+Under *f*<sub>5</sub> the element 1 goes to 2, and under *f*<sub>2</sub> the element 2 goes to 1, so
+*f*<sub>2</sub>*f*<sub>5</sub> sends 1 to 1. In the same way it sends 2 to 3 and 3 to 2, so
+
+<Display>*f*<sub>2</sub>*f*<sub>5</sub> = *f*<sub>4</sub>.</Display>
+
+On the other hand *f*<sub>5</sub>*f*<sub>2</sub> sends 1 to 3, 2 to 2 and 3 to 1, so
+*f*<sub>5</sub>*f*<sub>2</sub> = *f*<sub>3</sub>. Unlike the addition of integers, composition in
+*S*<sub>3</sub> depends on the order in which the two elements are taken.
+</Example>
+
+<Proposition n="1.5" title="Composition of the six bijections">
+1. *Closure:* the composite of two bijections is a bijection, so composition is a binary operation
+   on *S*<sub>3</sub>.
+2. *Identity:* *ff*<sub>1</sub> = *f*<sub>1</sub>*f* = *f* for every *f* ∈ *S*<sub>3</sub>.
+3. *Inverses:* *f*<sub>1</sub><sup>2</sup> = *f*<sub>2</sub><sup>2</sup> = *f*<sub>3</sub><sup>2</sup> =
+   *f*<sub>4</sub><sup>2</sup> = *f*<sub>1</sub> and *f*<sub>5</sub>*f*<sub>6</sub> =
+   *f*<sub>6</sub>*f*<sub>5</sub> = *f*<sub>1</sub>, so every element has an inverse.
+4. *Associativity:* (*fg*)*h* = *f*(*gh*) for all *f*, *g*, *h* ∈ *S*<sub>3</sub>.
+</Proposition>
+
+<Proof>
+For (i), let *f* and *g* be bijections. If *f*(*g*(*x*)) = *f*(*g*(*y*)) then *g*(*x*) = *g*(*y*), as *f*
+is one-to-one, and then *x* = *y*, as *g* is; so *fg* is one-to-one. Given *z*, there is *y* with
+*f*(*y*) = *z*, as *f* is onto, and *x* with *g*(*x*) = *y*, as *g* is; so *fg* is onto. Part (ii) holds
+because *f*<sub>1</sub> moves nothing. For (iii), *f*<sub>2</sub> sends 1 to 2 and 2 back to 1 and
+fixes 3, so *f*<sub>2</sub><sup>2</sup> fixes everything; *f*<sub>3</sub> and *f*<sub>4</sub> are
+alike. The composite *f*<sub>5</sub>*f*<sub>6</sub> sends 1 to 3 and then to 1, 2 to 1 and then to 2,
+and 3 to 2 and then to 3, and *f*<sub>6</sub>*f*<sub>5</sub> likewise fixes each element. For (iv),
+both (*fg*)*h* and *f*(*gh*) send *x* to *f*(*g*(*h*(*x*))).
+</Proof>
+
+<Example n="1.6" title="Rotations of an equilateral triangle">
+Take an equilateral triangle, as in [Fig. 1](#fig-1-caption), and rotate the plane about the triangle’s
+centre. A **rotational symmetry** of the triangle is a rotation that carries the triangle onto itself.
+A rotation through 90° is not one, but rotations anticlockwise through 120°, 240° and 360° are. Call
+these *R*<sub>2</sub>, *R*<sub>3</sub> and *R*<sub>1</sub>; the rotation *R*<sub>1</sub> through 360°
+is the same as a rotation through 0°, and moves nothing. Let
+
+<Display>*G* = \{*R*<sub>1</sub>, *R*<sub>2</sub>, *R*<sub>3</sub>\},</Display>
+
+with composition as its operation. Composing two rotations adds their angles:
+*R*<sub>2</sub>*R*<sub>3</sub> = *R*<sub>3</sub>*R*<sub>2</sub> = *R*<sub>1</sub>, since 120° + 240° =
+360°; *R*<sub>2</sub>*R*<sub>2</sub> = *R*<sub>3</sub>; and *R*<sub>3</sub>*R*<sub>3</sub> =
+*R*<sub>2</sub>, since 480° is a full turn and 120° more. So composition is a binary operation on
+*G*. The rotation *R*<sub>1</sub> is an identity element; *R*<sub>2</sub> and *R*<sub>3</sub> are
+inverses of each other, and *R*<sub>1</sub> is its own inverse; and composition is associative, as
+composition of functions always is.
+</Example>
+
+In each of the three examples, a set carries a binary operation that has an identity element, under
+which every element has an inverse, and which is associative. These four properties define a group.
+
+<Questions>
+<Question answer-ctx="In S_3 (Example 1.3): f1 is the identity; f2: 1↦2, 2↦1, 3↦3; f3: 1↦3, 2↦2, 3↦1; f4: 1↦1, 2↦3, 3↦2; f5: 1↦2, 2↦3, 3↦1; f6: 1↦3, 2↦1, 3↦2. The product fg means apply g first, then f. Expected: f3f4 sends 1↦3, 2↦1, 3↦2, so f3f4 = f6; f4f3 sends 1↦2, 2↦3, 3↦1, so f4f3 = f5. They are not equal. Check that the student applies the right-hand factor first, traces each of 1, 2, 3, and names the results as elements of S_3. The common error is composing in the wrong order, which swaps the two answers.">
+Compute *f*<sub>3</sub>*f*<sub>4</sub> and *f*<sub>4</sub>*f*<sub>3</sub> in *S*<sub>3</sub>.
+Are they equal?
+</Question>
+
+<Question answer-ctx="In S_3 (Example 1.3): f1 is the identity; f2: 1↦2, 2↦1, 3↦3; f3: 1↦3, 2↦2, 3↦1; f4: 1↦1, 2↦3, 3↦2; f5: 1↦2, 2↦3, 3↦1; f6: 1↦3, 2↦1, 3↦2. The product fg means apply g first, then f. Expected: g = f1 for f = f1; g = f2 for f2; g = f3 for f3; g = f4 for f4; g = f6 for f = f5; g = f5 for f = f6. Each claim should be justified by computing fg on 1, 2, 3. Check that f5 and f6 are paired with each other, not with themselves.">
+For each *f* ∈ *S*<sub>3</sub>, find the element *g* ∈ *S*<sub>3</sub> with *fg* = *f*<sub>1</sub>.
+</Question>
+
+<Question answer-ctx="In S_3 (Example 1.3): f1 is the identity; f2: 1↦2, 2↦1, 3↦3; f3: 1↦3, 2↦2, 3↦1; f4: 1↦1, 2↦3, 3↦2; f5: 1↦2, 2↦3, 3↦1; f6: 1↦3, 2↦1, 3↦2. The product fg means apply g first, then f. Expected: f5^2 sends 1↦3, 2↦1, 3↦2, so f5^2 = f6; f5^3 = f5 f6 = f1, the identity. Check the composition is traced point by point.">
+Compute *f*<sub>5</sub><sup>2</sup> and *f*<sub>5</sub><sup>3</sup>.
+</Question>
+
+<Question answer-ctx="The set is the even integers with ordinary multiplication. Expected: closure holds (a product of even integers is even) and associativity holds (inherited from ℤ). There is no identity: an identity e would need e·2 = 2, forcing e = 1, which is not even. Without an identity, inverses cannot exist. So it is not a group. Check that the absence of an identity is proved, not just asserted from the fact that 1 is odd.">
+Which of closure, identity, inverses and associativity hold for the set of even integers under
+multiplication?
+</Question>
+
+<Question answer-ctx="Expected: the product of integers is an integer; 1 is an identity (1·n = n·1 = n); multiplication is associative. The integers with a multiplicative inverse in ℤ are exactly 1 and −1: if ab = 1 with a, b integers then |a||b| = 1, so |a| = 1. Check that the student proves no other integer has an inverse, not just that 2 does not.">
+Show that multiplication on ℤ is closed, has an identity and is associative, and find every integer
+that has an inverse under multiplication.
+</Question>
+
+<Question answer-ctx="Expected: 0°, 90°, 180° and 270° (rotations about the centre of the square). Composing rotations through α and β gives the rotation through α + β, reduced modulo 360°, which is again one of the four, so composition is a binary operation on this set. Check that 0° (the identity) is included and that the closure argument covers every pair, for example by the angle-sum argument or a full table.">
+Find every angle *θ* with 0° ≤ *θ* &lt; 360° for which the rotation through *θ* about the centre of
+a square carries the square onto itself, and show that composition is a binary operation on these
+rotations.
+</Question>
+</Questions>
+
+## The definition of a group
+
+<Video id="-tP-cxErI-A" title="Definition of a group and examples" duration="26:05" />
+
+<Definition n="2.1" title="Binary operation">
+A **binary operation** on a set *G* is a function ∗ : *G* × *G* → *G*, written (*g*<sub>1</sub>,
+*g*<sub>2</sub>) ↦ *g*<sub>1</sub> ∗ *g*<sub>2</sub>.
+</Definition>
+
+Since *g*<sub>1</sub> ∗ *g*<sub>2</sub> lies in *G* again, closure is part of being a binary operation.
+
+<Definition n="2.2" title="Group">
+A **group** (*G*, ∗) is a set *G* with a binary operation ∗ satisfying three axioms:
+
+1. *identity:* there is an element *e* ∈ *G* with *g* ∗ *e* = *e* ∗ *g* = *g* for all *g* ∈ *G*;
+2. *inverses:* each *g* ∈ *G* has an element *g*<sup>−1</sup> ∈ *G* with *g* ∗ *g*<sup>−1</sup> =
+   *g*<sup>−1</sup> ∗ *g* = *e*;
+3. *associativity:* (*g*<sub>1</sub> ∗ *g*<sub>2</sub>) ∗ *g*<sub>3</sub> = *g*<sub>1</sub> ∗
+   (*g*<sub>2</sub> ∗ *g*<sub>3</sub>) for all *g*<sub>1</sub>, *g*<sub>2</sub>, *g*<sub>3</sub> ∈ *G*.
+</Definition>
+
+The identity element must exist before inverses can be defined. A set alone is not a group: a group
+is a set together with its operation. When the operation is clear from the context, one says simply
+that *G* is a group. Such a group is **abstract**: its elements need not be numbers, functions or
+rotations, and nothing is assumed of them beyond what the axioms impose.
+
+<Example n="2.3" title="First examples">
+The integers ℤ under addition, the bijections *S*<sub>3</sub> under composition, and the rotations of
+the equilateral triangle in Example 1.6 under composition are groups. So are the rational numbers ℚ,
+the real numbers ℝ and the complex numbers ℂ, each under addition: the sum of two rational, real or
+complex numbers is again one, 0 is an identity, each *x* has the inverse −*x* (the inverse of 1/2 is
+−1/2), and addition is associative.
+</Example>
+
+<Example n="2.4" title="The integers under multiplication">
+Multiplication on ℤ is closed, it is associative, and 1 is an identity, since *n* · 1 = 1 · *n* = *n*
+for every integer *n*, including 0. But 2 has no inverse: the only number *x* with 2*x* = 1 is 1/2,
+which is not an integer. So ℤ is not a group under multiplication.
+</Example>
+
+<Example n="2.5" title="The rationals under multiplication">
+In ℚ under multiplication, 2 has the inverse 1/2, and indeed every non-zero *r* ∈ ℚ has the inverse
+1/*r*. Multiplication is closed and associative, and 1 is an identity. But 0 has no inverse, since
+0 · *x* = 0 ≠ 1 for every *x*. So ℚ is not a group under multiplication.
+</Example>
+
+<Example n="2.6" title="Non-zero and positive numbers under multiplication">
+Let ℚ<sup>∗</sup> = ℚ ∖ \{0\} be the set of non-zero rational numbers, and ℝ<sup>∗</sup> and
+ℂ<sup>∗</sup> the sets of non-zero real and complex numbers. Each is a group under multiplication: a
+product of non-zero numbers is non-zero, 1 is an identity, each *r* has the inverse 1/*r*, which is
+defined because *r* ≠ 0, and multiplication is associative.
+
+Let ℚ<sup>+</sup> and ℝ<sup>+</sup> be the sets of positive rational and positive real numbers. Each is
+also a group under multiplication: a product of positive numbers is positive, the identity 1 is
+positive, and the inverse of a positive number is positive.
+
+The set ℤ<sup>∗</sup> = ℤ ∖ \{0\} of non-zero integers, however, is not a group under multiplication,
+since 2 still has no inverse in it.
+</Example>
+
+<Example n="2.7" title="The operation matters">
+None of ℚ<sup>∗</sup>, ℝ<sup>∗</sup>, ℂ<sup>∗</sup>, ℚ<sup>+</sup> and ℝ<sup>+</sup> is a group under
+addition. The only number *e* with *e* + *x* = *x* is 0, and 0 does not belong to any of these sets.
+</Example>
+
+Whether a set is a group depends on its operation: the same set can be a group under one operation and
+not under another. To specify a group is to specify its operation.
+
+<Questions>
+<Question answer-ctx="Expected: the even integers form a group under addition: closed (sum of evens is even), identity 0 is even, the inverse −n of an even n is even, associativity is inherited. The odd integers do not: the sum of two odd integers is even (1 + 1 = 2), so addition is not a binary operation on them, and 0 is not odd. Check that both parts are answered and that each axiom is addressed for the even integers.">
+Is the set of even integers a group under addition? Is the set of odd integers?
+</Question>
+
+<Question answer-ctx="Expected: no. The product of two negative reals is positive, for example (−1)(−1) = 1, so multiplication is not closed; also the multiplicative identity 1 is not negative. One failing axiom with a concrete example suffices.">
+Is the set of negative real numbers a group under multiplication?
+</Question>
+
+<Question answer-ctx="Expected: yes. Closure: the products 1·1 = 1, 1·(−1) = −1, (−1)·1 = −1, (−1)(−1) = 1 all lie in the set. Identity 1. Each element is its own inverse. Associativity holds because multiplication of real numbers is associative. Check that all four axioms are verified.">
+Show that \{1, −1\} is a group under multiplication.
+</Question>
+
+<Question answer-ctx="The set is the non-zero integers under multiplication. Expected: closure holds (a product of non-zero integers is non-zero), 1 is an identity, associativity holds. Inverses fail: for example 2 has no inverse, since 2x = 1 forces x = 1/2, not an integer; only 1 and −1 have inverses. So only the inverse axiom fails.">
+Which of the axioms of Definition 2.2 fail for ℤ<sup>∗</sup> under multiplication?
+</Question>
+
+<Question answer-ctx="Operation a ∗ b = a + b + 1 on ℤ. Expected: closure is clear. Associativity: (a ∗ b) ∗ c = a + b + c + 2 = a ∗ (b ∗ c). Identity e = −1, since a ∗ (−1) = a + (−1) + 1 = a and likewise on the other side. Inverse of a is −a − 2, since a + (−a − 2) + 1 = −1. Check that the identity is −1 (not 0) and that the inverse is checked against −1.">
+Define *a* ∗ *b* = *a* + *b* + 1 for integers *a* and *b*. Show that (ℤ, ∗) is a group, and find its
+identity element and the inverse of each *a*.
+</Question>
+
+<Question answer-ctx="Expected: the empty set is not a group under any operation, because a group must contain an identity element. The set containing only 0 is a group under addition: 0 + 0 = 0, 0 is the identity and is its own inverse, and addition is associative (the trivial group).">
+Is the empty set a group under any operation? Is \{0\} a group under addition?
+</Question>
+
+<Question answer-ctx="Expected: yes. If |z| = |w| = 1 then |zw| = |z||w| = 1, so the set is closed; 1 has absolute value 1; the inverse 1/z (equal to the conjugate of z) has |1/z| = 1/|z| = 1; multiplication of complex numbers is associative. Check that closure and inverses are justified with the multiplicativity of the absolute value.">
+Is the set of complex numbers of absolute value 1 a group under multiplication?
+</Question>
+</Questions>
+
+## Symmetric groups, roots of unity and matrices
+
+<Video id="S0hA-iWCp4g" title="More examples of groups" duration="24:25" />
+
+There is nothing special about the number 3 in the definition of *S*<sub>3</sub>.
+
+<Definition n="3.1" title="Symmetric group">
+For a positive integer *n*, *S*<sub>*n*</sub> is the set of bijections of \{1, 2, …, *n*\} to itself,
+with composition as its operation. It is the **symmetric group on *n* letters**.
+</Definition>
+
+<Proposition n="3.2" title="The symmetric group is a group">
+*S*<sub>*n*</sub> is a group under composition.
+</Proposition>
+
+<Proof>
+The composite of two bijections is a bijection, by the argument for Proposition 1.5 (i). The identity
+function, which sends each *k* to itself, is an identity element. If *σ* is a bijection, each *j* in
+\{1, …, *n*\} equals *σ*(*i*) for exactly one *i*; setting *σ*<sup>−1</sup>(*j*) = *i* defines a
+bijection with *σσ*<sup>−1</sup> = *σ*<sup>−1</sup>*σ* equal to the identity. Composition of
+functions is associative.
+</Proof>
+
+<Definition n="3.3" title="Roots of unity">
+A complex number *z* is an ***n*th root of unity** if *z*<sup>*n*</sup> = 1, and a **primitive *n*th
+root of unity** if moreover *z*<sup>*m*</sup> ≠ 1 for 0 &lt; *m* &lt; *n*.
+</Definition>
+
+For a positive integer *n* let
+
+<Display>*θ*<sub>*n*</sub> = cos(2π/*n*) + *i* sin(2π/*n*).</Display>
+
+Since (cos *α* + *i* sin *α*)<sup>*m*</sup> = cos *mα* + *i* sin *mα*, the power
+*θ*<sub>*n*</sub><sup>*m*</sup> is cos(2π*m*/*n*) + *i* sin(2π*m*/*n*). For *m* = *n* this is
+cos 2π + *i* sin 2π = 1, while for 0 &lt; *m* &lt; *n* the angle 2π*m*/*n* lies strictly between 0 and
+2π, so the power is not 1. Thus *θ*<sub>*n*</sub> is a primitive *n*th root of unity.
+
+<Proposition n="3.4" title="The group of nth roots of unity">
+The set
+
+<Display>*G*<sub>*n*</sub> = \{1, *θ*<sub>*n*</sub>, *θ*<sub>*n*</sub><sup>2</sup>, …, *θ*<sub>*n*</sub><sup>*n*−1</sup>\}</Display>
+
+is a group under multiplication, the **group of *n*th roots of unity**. Each of its elements is an
+*n*th root of unity.
+</Proposition>
+
+<Proof>
+Write *θ* for *θ*<sub>*n*</sub>. For 0 ≤ *j*, *k* ≤ *n* − 1 the product *θ*<sup>*j*</sup>*θ*<sup>*k*</sup>
+is *θ*<sup>*j*+*k*</sup>. If *j* + *k* ≥ *n*, then *θ*<sup>*j*+*k*</sup> =
+*θ*<sup>*n*</sup>*θ*<sup>*j*+*k*−*n*</sup> = *θ*<sup>*j*+*k*−*n*</sup> with 0 ≤ *j* + *k* − *n* ≤
+*n* − 2; for example *θ*<sup>*n*−1</sup>*θ*<sup>2</sup> = *θ*<sup>*n*</sup>*θ* = *θ*. In either case
+the product lies in *G*<sub>*n*</sub>, so multiplication is closed. The identity is 1 = *θ*<sup>0</sup>.
+For 1 ≤ *k* ≤ *n* − 1 the inverse of *θ*<sup>*k*</sup> is *θ*<sup>*n*−*k*</sup>, since
+*θ*<sup>*k*</sup>*θ*<sup>*n*−*k*</sup> = *θ*<sup>*n*</sup> = 1. Multiplication of complex numbers is
+associative. Finally (*θ*<sup>*k*</sup>)<sup>*n*</sup> = (*θ*<sup>*n*</sup>)<sup>*k*</sup> =
+1<sup>*k*</sup> = 1.
+</Proof>
+
+Not every element of *G*<sub>*n*</sub> is a primitive *n*th root of unity: 1 is never one when *n* > 1.
+
+<Example n="3.5" title="The fourth roots of unity">
+For *n* = 4, *θ*<sub>4</sub> = cos(π/2) + *i* sin(π/2) = *i*, the square root of −1. Then
+*θ*<sub>4</sub><sup>2</sup> = −1 and *θ*<sub>4</sub><sup>3</sup> = −*i*, so
+
+<Display>*G*<sub>4</sub> = \{1, *i*, −1, −*i*\}.</Display>
+</Example>
+
+The *n*th roots of unity lie on the unit circle in the complex plane: *θ*<sub>*n*</sub><sup>*k*</sup>
+is the point at angle 2π*k*/*n* from the positive real axis. In particular *θ*<sub>*n*</sub> is at
+angle 2π/*n*, and the fourth roots of unity are the four points 1, *i*, −1 and −*i*.
+
+<Example n="3.6" title="Matrices under addition">
+For positive integers *m* and *n*, let *M*<sub>*m*×*n*</sub>(ℝ) be the set of *m* × *n* matrices with
+real entries. It is a group under entrywise addition: the sum of two *m* × *n* matrices is again one,
+the zero matrix is the identity, the inverse of the matrix with entries *a*<sub>*jk*</sub> is the
+matrix with entries −*a*<sub>*jk*</sub>, and addition is associative because addition of real numbers
+is.
+</Example>
+
+Matrices can also be multiplied, but only when the number of columns of the first equals the number of
+rows of the second: two 2 × 3 matrices cannot be multiplied. On the set *M*<sub>*n*</sub>(ℝ) of real
+*n* × *n* matrices, multiplication is a binary operation. It is associative and the identity matrix
+*I* is an identity element, but *M*<sub>*n*</sub>(ℝ) is not a group under multiplication, because not
+every matrix has an inverse; the zero matrix has none.
+
+<Definition n="3.7" title="General linear group">
+GL<sub>*n*</sub>(ℝ) is the set of invertible *n* × *n* matrices with real entries.
+</Definition>
+
+<Proposition n="3.8" title="The general linear group is a group">
+GL<sub>*n*</sub>(ℝ) is a group under matrix multiplication.
+</Proposition>
+
+<Proof>
+If *A* and *B* are invertible, then (*AB*)(*B*<sup>−1</sup>*A*<sup>−1</sup>) = *I* =
+(*B*<sup>−1</sup>*A*<sup>−1</sup>)(*AB*), so *AB* is invertible and multiplication is a binary
+operation on GL<sub>*n*</sub>(ℝ). The identity matrix is invertible and is an identity element. Each
+*A* in GL<sub>*n*</sub>(ℝ) has an inverse *A*<sup>−1</sup>, which is itself invertible, with inverse
+*A*. Matrix multiplication is associative.
+</Proof>
+
+<Questions>
+<Question answer-ctx="θ_3 = cos(2π/3) + i sin(2π/3). Expected: G_3 = {1, −1/2 + (√3/2)i, −1/2 − (√3/2)i}, the second being θ_3 and the third θ_3^2. Check the values cos(2π/3) = −1/2 and sin(2π/3) = √3/2, and that θ_3^2 = cos(4π/3) + i sin(4π/3).">
+Write each element of *G*<sub>3</sub> in the form *a* + *bi* with *a*, *b* real.
+</Question>
+
+<Question answer-ctx="Expected: in G_4 = {1, i, −1, −i}, the primitive fourth roots of unity are i and −i (1 has 1^1 = 1 and (−1)^2 = 1). In G_6 the primitive sixth roots are θ_6 = 1/2 + (√3/2)i and θ_6^5 = 1/2 − (√3/2)i; θ_6^2 and θ_6^4 have cube 1, θ_6^3 = −1 has square 1. Check that each non-primitive element is shown to have a smaller power equal to 1.">
+Which elements of *G*<sub>4</sub> are primitive fourth roots of unity? Which elements of
+*G*<sub>6</sub> are primitive sixth roots of unity?
+</Question>
+
+<Question answer-ctx="Expected: suppose θ^j = θ^k with 0 ≤ j < k ≤ n − 1, where θ = θ_n. Multiplying by θ^(n−j) (the inverse of θ^j) gives θ^(k−j) = 1 with 0 < k − j < n, contradicting that θ_n is a primitive n-th root of unity. Alternatively, the angles 2πk/n are distinct in [0, 2π). Check that the contradiction uses 0 < k − j < n.">
+Show that the elements 1, *θ*<sub>*n*</sub>, …, *θ*<sub>*n*</sub><sup>*n*−1</sup> of
+*G*<sub>*n*</sub> are distinct.
+</Question>
+
+<Question answer-ctx="Expected: if z^n = 1 and w^n = 1 then (zw)^n = z^n w^n = 1, using commutativity of complex multiplication. z ≠ 0 since z^n = 1, and (1/z)^n = 1/z^n = 1. Check that commutativity is used (or acknowledged) when splitting (zw)^n.">
+Show that the product of two *n*th roots of unity is an *n*th root of unity, and so is the inverse
+of one.
+</Question>
+
+<Question answer-ctx="Expected: S_2 has two elements: the identity and the bijection 1↦2, 2↦1. The inverse of σ: 1↦2, 2↦3, 3↦4, 4↦1 is σ^(−1): 1↦4, 2↦1, 3↦2, 4↦3. Check by composing: σσ^(−1) and σ^(−1)σ both fix 1, 2, 3, 4.">
+List the elements of *S*<sub>2</sub>, and find the inverse in *S*<sub>4</sub> of the bijection
+1 ↦ 2, 2 ↦ 3, 3 ↦ 4, 4 ↦ 1.
+</Question>
+
+<Question answer-ctx="Expected: any two invertible 2 × 2 real matrices that do not commute. A standard choice: A = [[1, 1], [0, 1]], B = [[1, 0], [1, 1]] (rows listed), with AB = [[2, 1], [1, 1]] and BA = [[1, 1], [1, 2]]. Check that both matrices are shown to be invertible (for example determinant non-zero) and that both products are computed correctly.">
+Find two matrices *A* and *B* in GL<sub>2</sub>(ℝ) with *AB* ≠ *BA*.
+</Question>
+
+<Question answer-ctx="Expected: no. GL_n(ℝ) is not closed under addition: I and −I are invertible but I + (−I) is the zero matrix, which is not. Also the additive identity, the zero matrix, is not in GL_n(ℝ). One of these reasons with a concrete example suffices.">
+Is GL<sub>*n*</sub>(ℝ) a group under matrix addition?
+</Question>
+</Questions>
+
+## Basic properties and multiplication tables
+
+<Video id="9K6rXgxZAgs" title="Basic properties of groups and multiplication tables" duration="33:07" />
+
+From here on the operation of a group is written as juxtaposition: *ab* for *a* ∗ *b*. It is called
+the product of *a* and *b*, whatever the operation is.
+
+<Definition n="4.1" title="Abelian group">
+A group *G* is **abelian**, or **commutative**, if *ab* = *ba* for all *a*, *b* ∈ *G*.
+</Definition>
+
+Commutativity is not one of the group axioms. Abelian groups are those that happen to have it.
+
+<Example n="4.2" title="Abelian and non-abelian groups">
+The groups ℤ, ℚ, ℝ and ℂ under addition and ℚ<sup>∗</sup>, ℝ<sup>∗</sup>, ℂ<sup>∗</sup>,
+ℚ<sup>+</sup> and ℝ<sup>+</sup> under multiplication are abelian, since the addition and
+multiplication of numbers are commutative. The group *S*<sub>3</sub> is not abelian, since
+*f*<sub>2</sub>*f*<sub>5</sub> ≠ *f*<sub>5</sub>*f*<sub>2</sub> (Example 1.4). More generally
+*S*<sub>*n*</sub> is not abelian for *n* ≥ 3, while *S*<sub>1</sub> and *S*<sub>2</sub> are abelian.
+</Example>
+
+<Definition n="4.3" title="Finite group and order">
+A group *G* is **finite** if it has finitely many elements. The **order** of a finite group *G*, written
+|*G*|, is the number of its elements.
+</Definition>
+
+Finiteness depends only on the set, not on the operation.
+
+<Example n="4.4" title="Finite and infinite groups">
+For every *n* ≥ 1 the symmetric group *S*<sub>*n*</sub> is finite, of order |*S*<sub>*n*</sub>| = *n*!.
+The group *G*<sub>*n*</sub> of *n*th roots of unity is finite. The groups ℤ, ℚ, ℝ, ℂ,
+ℚ<sup>∗</sup>, ℝ<sup>∗</sup>, ℂ<sup>∗</sup>, ℚ<sup>+</sup> and ℝ<sup>+</sup> are infinite.
+</Example>
+
+The following properties hold in every group, and their proofs use nothing but the group axioms.
+
+<Proposition n="4.5" title="Cancellation">
+Let *a*, *b*, *c* be elements of a group *G*. If *ab* = *ac* then *b* = *c*. Likewise, if *ba* = *ca*
+then *b* = *c*.
+</Proposition>
+
+<Proof>
+Multiply both sides of *ab* = *ac* on the left by *a*<sup>−1</sup>, which exists by the inverse axiom:
+*a*<sup>−1</sup>(*ab*) = *a*<sup>−1</sup>(*ac*). By associativity, (*a*<sup>−1</sup>*a*)*b* =
+(*a*<sup>−1</sup>*a*)*c*, that is, *eb* = *ec*, since *a*<sup>−1</sup>*a* = *e*. As *e* is the
+identity, *b* = *c*. The second statement follows in the same way, multiplying on the right by
+*a*<sup>−1</sup>.
+</Proof>
+
+This is the familiar step of cancelling a common factor from both sides of an equation, made valid in
+any group by the axioms.
+
+<Proposition n="4.6" title="The identity is unique">
+A group has exactly one identity element.
+</Proposition>
+
+<Proof>
+Suppose *e* and *e*′ are both identity elements of *G*. Since *e* is an identity, *ee* = *e*. Since
+*e*′ is an identity, *ge*′ = *g* for every *g* ∈ *G*, and in particular *ee*′ = *e*. Thus *ee* = *ee*′,
+and cancellation (Proposition 4.5) gives *e* = *e*′.
+</Proof>
+
+It is therefore correct to speak of *the* identity of a group.
+
+<Proposition n="4.7" title="Inverses are unique">
+Each element of a group has exactly one inverse.
+</Proposition>
+
+<Proof>
+Suppose *g*<sub>1</sub> and *g*<sub>2</sub> are both inverses of *g*. Then *gg*<sub>1</sub> = *e* =
+*gg*<sub>2</sub>, and cancellation gives *g*<sub>1</sub> = *g*<sub>2</sub>.
+</Proof>
+
+In a group that is not abelian, *g*<sub>1</sub>*g*<sub>2</sub> and *g*<sub>2</sub>*g*<sub>1</sub>
+are in general different. When one of them is the identity, however, so is the other.
+
+<Proposition n="4.8" title="A one-sided inverse is the inverse">
+If *g*<sub>1</sub> and *g*<sub>2</sub> are elements of a group with *g*<sub>1</sub>*g*<sub>2</sub> =
+*e*, then *g*<sub>2</sub> = *g*<sub>1</sub><sup>−1</sup> and *g*<sub>2</sub>*g*<sub>1</sub> = *e*.
+</Proposition>
+
+<Proof>
+Multiply *g*<sub>1</sub>*g*<sub>2</sub> = *e* on the left by *g*<sub>1</sub><sup>−1</sup>:
+*g*<sub>1</sub><sup>−1</sup>(*g*<sub>1</sub>*g*<sub>2</sub>) = *g*<sub>1</sub><sup>−1</sup>*e* =
+*g*<sub>1</sub><sup>−1</sup>. By associativity the left side is
+(*g*<sub>1</sub><sup>−1</sup>*g*<sub>1</sub>)*g*<sub>2</sub> = *eg*<sub>2</sub> = *g*<sub>2</sub>.
+So *g*<sub>2</sub> = *g*<sub>1</sub><sup>−1</sup>, the unique inverse of *g*<sub>1</sub>
+(Proposition 4.7), and *g*<sub>2</sub>*g*<sub>1</sub> = *g*<sub>1</sub><sup>−1</sup>*g*<sub>1</sub> =
+*e*.
+</Proof>
+
+To check that *h* is the inverse of *g*, it is therefore enough to check that *gh* = *e*.
+
+<Definition n="4.9" title="Multiplication table">
+The **multiplication table** of a finite group *G* has one row and one column for each element of
+*G*, in the same order. The entry in the row of *a* and the column of *b* is the product *ab*.
+</Definition>
+
+A multiplication table describes the whole group compactly. Only a finite group has one.
+
+<Example n="4.10" title="The multiplication table of the fourth roots of unity">
+The group *G*<sub>4</sub> = \{1, −1, *i*, −*i*\} of Example 3.5 has the multiplication table
+
+|      | 1    | −1   | *i*  | −*i* |
+| ---- | ---- | ---- | ---- | ---- |
+| 1    | 1    | −1   | *i*  | −*i* |
+| −1   | −1   | 1    | −*i* | *i*  |
+| *i*  | *i*  | −*i* | −1   | 1    |
+| −*i* | −*i* | *i*  | 1    | −1   |
+
+For instance the entry in the row of *i* and the column of −*i* is *i* · (−*i*) = −*i*<sup>2</sup> = 1.
+</Example>
+
+In this table each row, and each column, lists every element of the group exactly once, in some order.
+This holds in every finite group.
+
+<Proposition n="4.11" title="Rows and columns of a multiplication table">
+In the multiplication table of a finite group *G*, every element of *G* appears exactly once in each
+row and exactly once in each column.
+</Proposition>
+
+<Proof>
+The row of *a* lists the products *ab* as *b* runs over *G*. If *ab* = *ac* then *b* = *c* by
+cancellation (Proposition 4.5), so no element appears twice in the row. The row has |*G*| entries, all
+distinct, so every element of *G* appears in it. The column of *b* lists the products *ab* as *a* runs
+over *G*, and the same argument applies, using the cancellation *ab* = *cb* ⇒ *a* = *c*.
+</Proof>
+
+This gives a check on a computed table: an element that is repeated, or missing, in some row or column
+signals an error.
+
+<Questions>
+<Question answer-ctx="Expected: g^(−1)g = e and gg^(−1) = e say exactly that g is an inverse of g^(−1). Since inverses are unique (Proposition 4.7), (g^(−1))^(−1) = g. Check that uniqueness of inverses is invoked; without it the argument only shows g is an inverse.">
+Show that (*g*<sup>−1</sup>)<sup>−1</sup> = *g* for every element *g* of a group.
+</Question>
+
+<Question answer-ctx="Expected: (gh)(h^(−1)g^(−1)) = g(hh^(−1))g^(−1) = geg^(−1) = gg^(−1) = e, using associativity. By Proposition 4.8 (a one-sided inverse is the inverse), or by checking the other product too, h^(−1)g^(−1) = (gh)^(−1). Common error: claiming (gh)^(−1) = g^(−1)h^(−1), which holds only when g and h commute.">
+Show that (*gh*)<sup>−1</sup> = *h*<sup>−1</sup>*g*<sup>−1</sup> for all elements *g* and *h* of a
+group.
+</Question>
+
+<Question answer-ctx="In S_3 (Example 1.3): f1 is the identity; f2: 1↦2, 2↦1, 3↦3; f3: 1↦3, 2↦2, 3↦1; f4: 1↦1, 2↦3, 3↦2; f5: 1↦2, 2↦3, 3↦1; f6: 1↦3, 2↦1, 3↦2. The product fg means apply g first, then f. Expected table (row f_i, column f_j, entry f_i f_j): f1: f1 f2 f3 f4 f5 f6; f2: f2 f1 f6 f5 f4 f3; f3: f3 f5 f1 f6 f2 f4; f4: f4 f6 f5 f1 f3 f2; f5: f5 f3 f4 f2 f6 f1; f6: f6 f4 f2 f3 f1 f5. Each element appears once in each row and column. Check the composition order; using the opposite order transposes the table.">
+Write down the multiplication table of *S*<sub>3</sub>, with the elements *f*<sub>1</sub>, …,
+*f*<sub>6</sub> of Example 1.3, and check that each element appears exactly once in each row and
+each column.
+</Question>
+
+<Question answer-ctx="Expected: S_1 has one element, so it is abelian. S_2 = {e, τ} with τ swapping 1 and 2; e commutes with everything and τ with itself, so S_2 is abelian. For n ≥ 3, let a swap 1 and 2 and b swap 2 and 3, both fixing everything else: ab(1) = a(b(1)) = a(1) = 2 while ba(1) = b(a(1)) = b(2) = 3, so ab ≠ ba. Check that the n ≥ 3 argument works for every such n, not only n = 3.">
+Show that *S*<sub>1</sub> and *S*<sub>2</sub> are abelian, and that *S*<sub>*n*</sub> is not
+abelian for *n* ≥ 3.
+</Question>
+
+<Question answer-ctx="Expected: a bijection f of {1, …, n} is determined by f(1), f(2), …, f(n), which must be distinct: n choices for f(1), n − 1 for f(2), …, 1 for f(n), giving n! bijections (every injective map of a finite set to itself is onto). An induction on n is equally valid. Check that distinctness of the values is used.">
+Show that |*S*<sub>*n*</sub>| = *n*! for every *n* ≥ 1.
+</Question>
+
+<Question answer-ctx="Expected: ab = b = eb, so right cancellation (multiply on the right by b^(−1)) gives a = e. Check that cancellation is on the correct side and is justified by the group axioms.">
+Show that if *ab* = *b* for some elements *a* and *b* of a group, then *a* = *e*.
+</Question>
+
+<Question answer-ctx="Expected: g^2 = e means g = g^(−1) for every g. Then ab = (ab)^(−1) = b^(−1)a^(−1) = ba. Alternatively: from (ab)^2 = e, abab = e; multiply on the left by a and on the right by b to get ba = ab. Check the step (ab)^(−1) = b^(−1)a^(−1) (not a^(−1)b^(−1)).">
+Show that a group in which *g*<sup>2</sup> = *e* for every element *g* is abelian.
+</Question>
+
+<Question answer-ctx="G_3 = {1, θ, θ^2} with θ = θ_3 and θ^3 = 1. Expected table (row x, column y, entry xy): 1: 1, θ, θ^2; θ: θ, θ^2, 1; θ^2: θ^2, 1, θ. Writing θ = −1/2 + (√3/2)i is fine. Check θ·θ^2 = 1 and θ^2·θ^2 = θ.">
+Write down the multiplication table of *G*<sub>3</sub>.
+</Question>
+</Questions>
+
+## Deciding whether a set is a group
+
+<Video id="PQL3lv35KxU" title="Deciding whether a set is a group" duration="25:48" />
+
+To decide whether a set with an operation is a group, check each of closure, identity, inverses and
+associativity in turn. A natural operation on a familiar set may fail some of them, and a set that is
+not a group can sometimes be made into one by adding elements to it or by removing some.
+
+<Example n="5.1" title="Subtraction on the integers">
+Define *a* ∗ *b* = *a* − *b* on ℤ. The difference of two integers is an integer, so ∗ is a binary
+operation. Since *a* ∗ 0 = *a* for every *a*, the only candidate for an identity is 0, but
+0 ∗ *a* = −*a*, which differs from *a* when *a* ≠ 0. So there is no identity element. Nor is ∗
+associative: 5 ∗ (3 ∗ 2) = 5 − 1 = 4, while (5 ∗ 3) ∗ 2 = 2 − 2 = 0. So (ℤ, ∗) is not a group.
+</Example>
+
+<Example n="5.2" title="A new operation on the integers">
+Define *a* ∗ *b* = *a* + *b* + *ab* on ℤ; for instance 3 ∗ 5 = 3 + 5 + 15 = 23. This is a binary
+operation on ℤ, and 0 is an identity, since *a* ∗ 0 = *a* + 0 + 0 = *a* and 0 ∗ *a* = *a*. It is
+associative, since
+
+<Display>(*a* ∗ *b*) ∗ *c* = (*a* + *b* + *ab*) + *c* + (*a* + *b* + *ab*)*c* = *a* + *b* + *c* + *ab* + *ac* + *bc* + *abc*,</Display>
+
+and expanding *a* ∗ (*b* ∗ *c*) = *a* + (*b* + *c* + *bc*) + *a*(*b* + *c* + *bc*) gives the same seven
+terms. But an inverse *b* of *a* must satisfy *a* + *b* + *ab* = 0, that is, *b*(1 + *a*) = −*a*, so
+*b* = −*a*/(1 + *a*). For *a* = 2 this is −2/3, which is not an integer. So (ℤ, ∗) has three of the
+four properties, but it is not a group.
+</Example>
+
+<Proposition n="5.3" title="Removing −1 from the rationals">
+Let *G* = ℚ ∖ \{−1\}, with *a* ∗ *b* = *a* + *b* + *ab*. Then (*G*, ∗) is a group.
+</Proposition>
+
+<Proof>
+Note that *a* ∗ *b* = (1 + *a*)(1 + *b*) − 1. If *a*, *b* ∈ *G* then 1 + *a* and 1 + *b* are non-zero,
+so (1 + *a*)(1 + *b*) ≠ 0 and *a* ∗ *b* ≠ −1; thus ∗ is a binary operation on *G*. As in Example 5.2,
+0 ∈ *G* is an identity and ∗ is associative. For *a* ∈ *G* let *b* = −*a*/(1 + *a*), which is a
+rational number because *a* ≠ −1. Then *a* + *b* + *ab* = *a* + *b*(1 + *a*) = *a* − *a* = 0, and
+likewise *b* ∗ *a* = 0. Finally *b* ≠ −1, for otherwise −*a* = −1 − *a*. So *b* ∈ *G* is an inverse of
+*a*.
+</Proof>
+
+On ℤ inverses are missing; enlarging the set to ℚ supplies all of them except an inverse of −1, and
+removing −1 yields a group.
+
+<Definition n="5.4" title="Coprime integers; reduced form">
+Integers *a* and *b* are **coprime** if they have no common factor other than ±1. For example, 6 and
+10 are not coprime, as 2 divides both, while 6 and 25 are. A rational number *a*/*b* with *b* > 0 is
+in **reduced form** if *a* and *b* are coprime; every rational number has a unique reduced form,
+obtained by cancelling common factors.
+</Definition>
+
+<Example n="5.5" title="Fractions whose denominator is divisible by 5">
+Let *G* be the set of rational numbers whose reduced form *a*/*b* has 5 dividing *b*. Membership must
+be read from the reduced form: 1/5 ∈ *G*, but 1/4 ∉ *G*, even though 1/4 = 5/20. Under addition,
+*G* is not closed: 2/5 and 3/5 lie in *G*, but 2/5 + 3/5 = 1 = 1/1, and 5 does not divide 1. So
+*G* is not a group under addition.
+</Example>
+
+<Proposition n="5.6" title="Fractions whose denominator is prime to 5">
+Let *G*′ be the set of rational numbers whose reduced form *a*/*b* has 5 not dividing *b*. Then *G*′ is
+a group under addition.
+</Proposition>
+
+<Proof>
+Let *a*/*b* and *c*/*d* be in *G*′, in reduced form, so that 5 divides neither *b* nor *d*. Their sum
+is (*ad* + *bc*)/*bd*. Since 5 is prime and divides neither *b* nor *d*, it does not divide *bd*. This
+fraction may not be in reduced form, but reducing it only cancels factors, so the reduced denominator
+divides *bd* and is not divisible by 5 either. Hence the sum lies in *G*′. The identity 0 = 0/1 lies
+in *G*′, as 5 does not divide 1. The inverse of *a*/*b* is −*a*/*b*, which has the same denominator
+and so lies in *G*′. Addition is associative because it is associative on ℚ.
+</Proof>
+
+Changing the condition on the denominator from “divisible by 5” to “not divisible by 5” turns a set
+that is not even closed under addition into a group.
+
+<Questions>
+<Question answer-ctx="Operation a ∗ b = a/b on ℚ* (non-zero rationals). Expected: not a group. It is closed, but not associative: (2 ∗ 1) ∗ 2 = 1 while 2 ∗ (1 ∗ 2) = 4. There is no identity: a ∗ 1 = a for all a, but 1 ∗ a = 1/a ≠ a when a ≠ ±1. Either failure suffices with a concrete example.">
+Is ℚ<sup>∗</sup> a group under the operation *a* ∗ *b* = *a*/*b*?
+</Question>
+
+<Question answer-ctx="Expected: yes, by the argument of Proposition 5.6 with 2 in place of 5. If a/b and c/d are in reduced form with b, d odd, the sum is (ad + bc)/bd and bd is odd; reducing only removes factors, so the reduced denominator is odd. 0 = 0/1 is in the set; −a/b has the same denominator; associativity is inherited from ℚ. Check that the closure argument says why reducing keeps the denominator odd.">
+Show that the set of rational numbers whose reduced form *a*/*b* has *b* odd is a group under
+addition.
+</Question>
+
+<Question answer-ctx="Expected: no. It is not closed: 1/2 and 1/3 belong to it, but 1/2 + 1/3 = 5/6, and 6 divides 6. The proof of Proposition 5.6 used that 5 is prime, and 6 is not. A counterexample to closure suffices.">
+Is the set of rational numbers whose reduced form *a*/*b* has 6 not dividing *b* a group under
+addition?
+</Question>
+
+<Question answer-ctx="Expected: closure under multiplication: (a/b)(c/d) = ac/bd and 5 does not divide bd (5 is prime and divides neither b nor d), and reducing keeps this. Not a group: 0 is in the set but has no multiplicative inverse; or 5 = 5/1 is in the set but its inverse 1/5 is not. Check that a specific failing inverse is given.">
+Show that the set *G*′ of Proposition 5.6 is closed under multiplication, but is not a group under
 multiplication.
-</Example>
+</Question>
 
-<Example n="1.3" title="The symmetries of the triangle">
-The six symmetries of the triangle in [Fig. 1](#fig-1-caption) form a group *D*<sub>3</sub>, the
-operation being “one after the other”. It is not abelian: reflecting in the red axis and then the blue
-does not give the same result as the blue and then the red.
-</Example>
+<Question answer-ctx="Operation a ∗ b = a + b − ab on ℝ minus {1}. Expected: 1 − a ∗ b = (1 − a)(1 − b), which is non-zero when a, b ≠ 1, so the set is closed. Identity 0. Associativity: both (a ∗ b) ∗ c and a ∗ (b ∗ c) equal a + b + c − ab − ac − bc + abc. Inverse of a: b = a/(a − 1) (equivalently −a/(1 − a)), which is defined since a ≠ 1 and is not 1. Check that closure and that the inverse lies in the set are both proved.">
+Show that ℝ ∖ \{1\} is a group under *a* ∗ *b* = *a* + *b* − *ab*.
+</Question>
 
-<Proposition n="1.4" title="Identity and inverses are unique">
-The identity of a group is unique, and each element has exactly one inverse.
+<Question answer-ctx="Group: ℚ minus {−1} with a ∗ b = a + b + ab (Proposition 5.3), identity 0. Expected: the inverse of 2 is −2/3, since 2 + (−2/3) + 2(−2/3) = 0. Solving 2 ∗ x = 5: 2 + x + 2x = 5, so x = 1 (check: 2 + 1 + 2 = 5). Solving by x = (−2/3) ∗ 5 also gives 1.">
+In the group of Proposition 5.3, find the inverse of 2 and solve the equation 2 ∗ *x* = 5.
+</Question>
+
+<Question answer-ctx="Operation a ∗ b = max(a, b) on ℤ. Expected: closure holds; associativity holds (both sides equal the largest of a, b, c). There is no identity: it would need max(a, e) = a for every integer a, i.e. e ≤ a for all a, impossible in ℤ. With no identity, inverses fail too. Not a group.">
+Which of closure, identity, inverses and associativity hold for ℤ under *a* ∗ *b* = max(*a*, *b*)?
+</Question>
+</Questions>
+
+## Powers of an element in a finite group
+
+<Video id="P5XhJg_JN1U" title="Powers of an element in a finite group" duration="22:19" />
+
+The problems in this section concern an arbitrary group, so their solutions may use only the group
+axioms and what follows from them, and no property special to numbers, functions or any other
+example.
+
+<Definition n="6.1" title="Powers of an element">
+Let *a* be an element of a group *G* and *n* a positive integer. The **power** *a*<sup>*n*</sup> is the
+product *aa* ⋯ *a* of *n* copies of *a*. Further, *a*<sup>0</sup> = *e* and
+*a*<sup>−*n*</sup> = (*a*<sup>−1</sup>)<sup>*n*</sup>.
+</Definition>
+
+By associativity a product of several elements has the same value however it is bracketed, so
+*a*<sup>*n*</sup> is well defined. Each power of *a* lies in *G*, because the operation is closed.
+
+<Proposition n="6.2" title="Some power of each element is the identity">
+If *G* is a finite group and *a* ∈ *G*, there is a positive integer *n* with *a*<sup>*n*</sup> = *e*.
 </Proposition>
 
 <Proof>
-If *e* and *e*′ are both identities then *e* = *ee*′ = *e*′. If *h* and *h*′ are both inverses of *g*,
-then *h* = *he* = *h*(*gh*′) = (*hg*)*h*′ = *eh*′ = *h*′.
+The powers *a*, *a*<sup>2</sup>, *a*<sup>3</sup>, … all lie in *G*. If they were all distinct, they would
+form an infinite subset of the finite set *G*, which is impossible. So *a*<sup>*n*</sup> =
+*a*<sup>*m*</sup> for some positive integers *n* ≠ *m*, and we may take *n* > *m*. Multiply both sides
+on the right by (*a*<sup>−1</sup>)<sup>*m*</sup>. On the right-hand side the *m* copies of *a* cancel
+against the *m* copies of *a*<sup>−1</sup> one pair at a time, from the middle outwards, since
+*aa*<sup>−1</sup> = *e*, leaving *e*. On the left-hand side the same cancellation removes *m* of the
+*n* copies of *a*, leaving *a*<sup>*n*−*m*</sup>. So *a*<sup>*n*−*m*</sup> = *e*, and *n* − *m* is a
+positive integer.
 </Proof>
 
-## Subgroups
+For instance, if *a*<sup>5</sup> = *a*<sup>3</sup>, multiplying by (*a*<sup>−1</sup>)<sup>3</sup> cancels
+three copies of *a* on each side and gives *a*<sup>2</sup> = *e*.
 
-<Definition n="2.1" title="Subgroup">
-A subset *H* of a group *G* is a **subgroup**, written *H* ≤ *G*, if *H* is itself a group under the
-operation of *G*.
-</Definition>
+<Example n="6.3" title="The integers under addition">
+Proposition 6.2 fails for infinite groups. In ℤ under addition the *n*th power of 1 is the sum
+1 + 1 + ⋯ + 1 of *n* ones, which is *n*. The identity is 0, and *n* ≠ 0 for every positive integer
+*n*.
+</Example>
 
-<Proposition n="2.2" name="Subgroup test" title="The subgroup test">
-A non-empty subset *H* of *G* is a subgroup if and only if *gh*<sup>−1</sup> ∈ *H* for all *g*, *h* ∈ *H*.
-</Proposition>
-
-<Proof>
-A subgroup clearly has this property. Conversely, choose *h* ∈ *H*. Taking *g* = *h* gives *e* ∈ *H*;
-taking *g* = *e* gives *h*<sup>−1</sup> ∈ *H*; and then *g*(*h*<sup>−1</sup>)<sup>−1</sup> = *gh* ∈ *H*,
-so *H* is closed. Associativity is inherited from *G*.
-</Proof>
-
-<Definition n="2.3" title="Order of an element; cyclic subgroups">
-The **order** of an element *g* is the least *n* ≥ 1 with *g*<sup>*n*</sup> = *e*, if there is one. The
-**cyclic subgroup** generated by *g* is ⟨*g*⟩ = \{*g*<sup>*k*</sup> : *k* ∈ ℤ\}, and its order is the
-order of *g*.
-</Definition>
-
-The subgroups of *D*<sub>3</sub> are the trivial subgroup, three subgroups of order 2 (each reflection
-together with the identity), the subgroup of order 3 formed by the rotations, and *D*<sub>3</sub>
-itself. No subgroup has order 4 or 5, and the next section explains why none could.
-
-## Cosets and Lagrange’s theorem
-
-<Definition n="3.1" title="Cosets and index">
-For *H* ≤ *G* and *g* ∈ *G*, the **left coset** of *H* containing *g* is *gH* = \{*gh* : *h* ∈ *H*\}.
-The number of left cosets is the **index** of *H* in *G*, written [*G* : *H*].
-</Definition>
-
-<Lemma n="3.2" title="Cosets partition the group">
-The left cosets of *H* partition *G*, and each has exactly |*H*| elements.
+<Lemma n="6.4" title="Multiples of an exponent">
+If *a*<sup>*n*</sup> = *e* and *n* divides *m*, where *n* and *m* are positive integers, then
+*a*<sup>*m*</sup> = *e*.
 </Lemma>
 
 <Proof>
-Every *g* lies in *gH*, so the cosets cover *G*. If *gH* and *g*′*H* share an element, say *gh* =
-*g*′*h*′, then *g* = *g*′*h*′*h*<sup>−1</sup> ∈ *g*′*H*, so *gH* ⊆ *g*′*H*; by symmetry the two cosets
-are equal. Finally *h* ↦ *gh* is a bijection from *H* to *gH*, with inverse *x* ↦ *g*<sup>−1</sup>*x*.
+Write *m* = *nk*. By associativity the product of *m* copies of *a* may be grouped into *k* blocks of
+*n* copies each, so *a*<sup>*m*</sup> = (*a*<sup>*n*</sup>)<sup>*k*</sup> = *e*<sup>*k*</sup> = *e*.
 </Proof>
 
-<Theorem n="3.3" name="Lagrange" title="Lagrange’s theorem">
-If *G* is finite and *H* ≤ *G*, then
+In Proposition 6.2 the integer *n* may depend on *a*. In a finite group a single exponent serves for
+every element.
 
-<Display>|*G*| = [*G* : *H*] · |*H*|.</Display>
-
-In particular the order of a subgroup divides the order of the group.
-</Theorem>
-
-<Proof>
-By Lemma 3.2, *G* is the disjoint union of [*G* : *H*] cosets, each of size |*H*|.
-</Proof>
-
-<Corollary n="3.4" title="Element orders divide the group order">
-In a finite group the order of every element divides the order of the group. A group of prime order is
-cyclic, generated by any element other than the identity.
-</Corollary>
-
-The converse of Lagrange’s theorem fails: a group need not have a subgroup of every order dividing its
-own. The alternating group *A*<sub>4</sub>, of order 12, has no subgroup of order 6 (Problem 8.6).
-
-## Normal subgroups and quotients
-
-<Definition n="4.1" title="Normal subgroup">
-A subgroup *N* ≤ *G* is **normal**, written *N* ⊴ *G*, if *gNg*<sup>−1</sup> = *N* for every *g* ∈ *G*;
-equivalently, if every left coset *gN* equals the right coset *Ng*.
-</Definition>
-
-When *N* is normal, the cosets of *N* form a group *G*/*N*, the **quotient** of *G* by *N*, under the
-operation
-
-<Display>(*gN*)(*hN*) = *ghN*.</Display>
-
-Normality is exactly what makes this well defined: the product must not depend on which elements are
-chosen to name the two cosets.
-
-<Proposition n="4.2" title="Subgroups of index 2 are normal">
-Every subgroup of index 2 is normal.
+<Proposition n="6.5" title="One exponent for every element">
+If *G* is a finite group, there is a positive integer *N* with *a*<sup>*N*</sup> = *e* for every
+*a* ∈ *G*.
 </Proposition>
 
 <Proof>
-If [*G* : *H*] = 2, the two left cosets are *H* and its complement *G* ∖ *H*, and so are the two right
-cosets. Hence *gH* = *Hg* for every *g*.
+Let *G* = \{*a*<sub>1</sub>, …, *a*<sub>*r*</sub>\}. By Proposition 6.2 there are positive integers
+*n*<sub>1</sub>, …, *n*<sub>*r*</sub> with *a*<sub>*k*</sub><sup>*n*<sub>*k*</sub></sup> = *e* for each
+*k*. Let *N* = *n*<sub>1</sub>*n*<sub>2</sub> ⋯ *n*<sub>*r*</sub>. Each *n*<sub>*k*</sub> divides
+*N*, so *a*<sub>*k*</sub><sup>*N*</sup> = *e* by Lemma 6.4.
 </Proof>
 
-<Example n="4.3" title="Normal subgroups of *D*<sub>3</sub>">
-The rotations form a subgroup of index 2 in *D*<sub>3</sub>, so they are normal, and the quotient has
-order 2: it records only whether a symmetry turns the triangle over. The subgroup formed by the identity
-and the reflection in the red axis is not normal, since conjugating that reflection by a rotation gives
-a reflection in another axis.
-</Example>
+<Questions>
+<Question answer-ctx="Expected: a^m a^n is a product of m copies of a followed by n copies; by associativity the brackets do not matter, so it is a product of m + n copies, a^(m+n). Likewise (a^m)^n is n blocks of m copies, a product of mn copies, a^(mn). An induction on n is equally valid. Check that associativity is cited.">
+Show that *a*<sup>*m*</sup>*a*<sup>*n*</sup> = *a*<sup>*m*+*n*</sup> and
+(*a*<sup>*m*</sup>)<sup>*n*</sup> = *a*<sup>*mn*</sup> for all positive integers *m* and *n*.
+</Question>
 
-## Homomorphisms
+<Question answer-ctx="Expected: a^n (a^(−1))^n = e, by cancelling a a^(−1) = e pairs from the middle outwards (associativity); then by Proposition 4.8 (a one-sided inverse is the inverse), (a^n)^(−1) = (a^(−1))^n. An induction using (gh)^(−1) = h^(−1)g^(−1) is equally valid.">
+Show that (*a*<sup>*n*</sup>)<sup>−1</sup> = (*a*<sup>−1</sup>)<sup>*n*</sup> for every positive
+integer *n*.
+</Question>
 
-<Definition n="5.1" title="Homomorphism, kernel and image">
-A **homomorphism** is a map φ : *G* → *K* between groups with φ(*gh*) = φ(*g*)φ(*h*) for all *g*,
-*h* ∈ *G*. Its **kernel** is ker φ = \{*g* ∈ *G* : φ(*g*) = *e*\} and its **image** is
-im φ = \{φ(*g*) : *g* ∈ *G*\}. A bijective homomorphism is an **isomorphism**, written *G* ≅ *K*.
-</Definition>
+<Question answer-ctx="In S_3 (Example 1.3): f1 is the identity; f2: 1↦2, 2↦1, 3↦3; f3: 1↦3, 2↦2, 3↦1; f4: 1↦1, 2↦3, 3↦2; f5: 1↦2, 2↦3, 3↦1; f6: 1↦3, 2↦1, 3↦2. The product fg means apply g first, then f. Expected: the least n with f^n = f1 is 1 for f1; 2 for f2, f3, f4; 3 for f5 and f6. The least N that works for every element is 6, the least common multiple of 1, 2, 3. Check that N = 6 is justified as least (a smaller N fails for an element of order 2 or 3).">
+For each element *f* of *S*<sub>3</sub>, find the least positive integer *n* with
+*f*<sup>*n*</sup> = *f*<sub>1</sub>. Then find the least positive integer *N* with
+*f*<sup>*N*</sup> = *f*<sub>1</sub> for every *f* ∈ *S*<sub>3</sub>.
+</Question>
 
-<Proposition n="5.2" title="Kernels are normal">
-The kernel of a homomorphism is a normal subgroup of its domain, and φ is injective if and only if its
-kernel is trivial.
-</Proposition>
+<Question answer-ctx="Expected: only 1 and −1. If r^n = 1 then |r|^n = 1 with |r| a positive rational, so |r| = 1 (if |r| > 1 the powers exceed 1, if |r| < 1 they are below 1). And 1^1 = 1, (−1)^2 = 1. Check that the argument rules out every other rational.">
+Which elements *r* of ℚ<sup>∗</sup> have *r*<sup>*n*</sup> = 1 for some positive integer *n*?
+</Question>
+
+<Question answer-ctx="Expected: by Proposition 6.2 there is n ≥ 1 with a^n = e. Then a·a^(n−1) = a^n = e, so a^(n−1) = a^(−1) by Proposition 4.8 (or uniqueness of inverses); take k = n − 1 ≥ 0, with a^0 = e. Check that the case n = 1 (a = e, k = 0) is covered.">
+Let *a* be an element of a finite group. Show that *a*<sup>−1</sup> = *a*<sup>*k*</sup> for some
+integer *k* ≥ 0.
+</Question>
+
+<Question answer-ctx="Expected: among the |G| + 1 elements e = a^0, a, a^2, …, a^|G| of G, two must be equal (pigeonhole): a^i = a^j with 0 ≤ i < j ≤ |G|. Cancelling gives a^(j−i) = e with 1 ≤ j − i ≤ |G|. So each a has a positive n_a ≤ |G| with a^(n_a) = e; n_a divides |G|!, so a^(|G|!) = e by Lemma 6.4. Check that the bound n ≤ |G| is actually proved, not assumed.">
+Show that, in the proof of Proposition 6.2, *n* can be chosen with 1 ≤ *n* ≤ |*G*|. Deduce that
+*a*<sup>*N*</sup> = *e* for every element *a* of *G* when *N* = |*G*|!.
+</Question>
+</Questions>
+
+## Groups of order at most five are abelian
+
+<Video id="8nof6OH5e8k" title="Groups of order at most five are abelian" duration="35:13" />
+
+The group *S*<sub>3</sub> has order 6 and is not abelian. No smaller group fails to be abelian, and
+the proof uses nothing but the group axioms and their first consequences.
+
+A group *G* fails to be abelian exactly when it has two elements *a* and *b* with *ab* ≠ *ba*. The
+proof shows that a group with five or fewer elements has no room for such a pair.
+
+<Lemma n="7.1" title="Elements that do not commute">
+Every element of a group commutes with the identity and with its own inverse. If *ab* ≠ *ba*, then
+*e*, *a*, *b* are distinct, and neither *ab* nor *ba* is equal to *e*, *a* or *b*.
+</Lemma>
 
 <Proof>
-If *k* ∈ ker φ and *g* ∈ *G* then φ(*gkg*<sup>−1</sup>) = φ(*g*) *e* φ(*g*)<sup>−1</sup> = *e*, so
-*gkg*<sup>−1</sup> ∈ ker φ; the subgroup test does the rest. And φ(*g*) = φ(*h*) exactly when
-*gh*<sup>−1</sup> ∈ ker φ.
+*ae* = *a* = *ea*, and *aa*<sup>−1</sup> = *e* = *a*<sup>−1</sup>*a*. Now suppose *ab* ≠ *ba*. Then
+*a* ≠ *e* and *b* ≠ *e*, since each commutes with *e*, and *a* ≠ *b*, since *a* commutes with itself.
+If *ab* = *e* then *ba* = *e* by Proposition 4.8, so *ab* = *ba*; hence *ab* ≠ *e*. If *ab* = *a* = *ae*,
+cancellation gives *b* = *e*; if *ab* = *b* = *eb*, it gives *a* = *e*. Neither is possible. The same
+arguments apply to *ba*.
 </Proof>
 
-<Theorem n="5.3" name="First isomorphism theorem" title="The first isomorphism theorem">
-For any homomorphism φ : *G* → *K*, the map *g* ker φ ↦ φ(*g*) is a well-defined isomorphism
-
-<Display>*G* / ker φ ≅ im φ.</Display>
-</Theorem>
-
-<Example n="5.4" title="The sign homomorphism">
-The sign of a permutation is a homomorphism *S*<sub>*n*</sub> → \{±1\}. For *n* ≥ 2 it is onto, and
-its kernel is the alternating group *A*<sub>*n*</sub> of even permutations, so by Theorem 5.3
-*S*<sub>*n*</sub> / *A*<sub>*n*</sub> ≅ \{±1\}.
-</Example>
-
-## Group actions
-
-<Definition n="6.1" title="Group action, orbit and stabiliser">
-An **action** of a group *G* on a set *X* is a map *G* × *X* → *X*, written (*g*, *x*) ↦ *g* · *x*,
-such that *e* · *x* = *x* and *g* · (*h* · *x*) = (*gh*) · *x* for all *g*, *h* ∈ *G* and *x* ∈ *X*.
-The **orbit** of *x* is *G* · *x* = \{*g* · *x* : *g* ∈ *G*\}, and its **stabiliser** is
-*G*<sub>*x*</sub> = \{*g* ∈ *G* : *g* · *x* = *x*\}.
-</Definition>
-
-<Theorem n="6.2" name="Orbit–stabiliser" title="The orbit–stabiliser theorem">
-If a finite group *G* acts on *X*, then for every *x* ∈ *X*
-
-<Display>|*G* · *x*| · |*G*<sub>*x*</sub>| = |*G*|.</Display>
+<Theorem n="7.2" title="Groups of order at most five are abelian">
+Every group of order at most 5 is abelian.
 </Theorem>
 
 <Proof>
-The stabiliser is a subgroup, and *g* · *x* = *h* · *x* exactly when *g*<sup>−1</sup>*h* ∈
-*G*<sub>*x*</sub>, that is, when *gG*<sub>*x*</sub> = *hG*<sub>*x*</sub>. So points of the orbit
-correspond one to one with left cosets of the stabiliser, and Lagrange’s theorem finishes the count.
+A group contains its identity, so |*G*| ≥ 1. Consider each order in turn.
+
+*Order 1 or 2.* Then *G* = \{*e*\} or *G* = \{*e*, *a*\}, and every element commutes with *e*.
+
+*Order 3.* Let *G* = \{*e*, *a*, *b*\}. The only pair that might not commute is *a*, *b*. The product
+*ab* lies in *G*. It is not *a*, for *ab* = *a* = *ae* gives *b* = *e*, and not *b*, for *ab* = *b*
+gives *a* = *e*. So *ab* = *e*, and then *ba* = *e* by Proposition 4.8.
+
+*Order 4.* Suppose *ab* ≠ *ba*. By Lemma 7.1, *e*, *a*, *b* are three distinct elements and *ab* is none
+of them, so *G* = \{*e*, *a*, *b*, *ab*\}. But *ba* is also none of *e*, *a*, *b*, so *ba* = *ab*, a
+contradiction.
+
+*Order 5.* Suppose *ab* ≠ *ba*. By Lemma 7.1 the elements *e*, *a*, *b*, *ab*, *ba* are distinct, so
+
+<Display>*G* = \{*e*, *a*, *b*, *ab*, *ba*\}.</Display>
+
+First, *aba* = *b*. The product *aba* is one of the five elements. If *aba* = *e*, then *a*(*ba*) = *e*
+and (*ab*)*a* = *e*, so both *ba* and *ab* are inverses of *a*, and *ab* = *ba* by Proposition 4.7. If
+*aba* = *a*, cancelling *a* on the left gives *ba* = *e*, which Lemma 7.1 excludes. If *aba* = *ab*,
+cancelling *ab* on the left gives *a* = *e*; if *aba* = *ba*, cancelling *ba* on the right gives
+*a* = *e*. Only *aba* = *b* remains. In the same way, with the roles of *a* and *b* exchanged,
+*bab* = *a*.
+
+Second, *a*<sup>2</sup> = *b*<sup>2</sup>. Multiplying *aba* = *b* on the left by *b* gives *baba* =
+*b*<sup>2</sup>, and multiplying *bab* = *a* on the right by *a* gives *baba* = *a*<sup>2</sup>.
+
+Third, *a*<sup>2</sup> = *e*. If *a*<sup>2</sup> = *a*, cancelling gives *a* = *e*. If
+*a*<sup>2</sup> = *b*, then *b*<sup>2</sup> = *a*<sup>2</sup> = *b*, and cancelling gives *b* = *e*. If
+*a*<sup>2</sup> = *ab*, cancelling *a* on the left gives *a* = *b*; if *a*<sup>2</sup> = *ba*,
+cancelling *a* on the right gives *a* = *b*. Each is impossible, so *a*<sup>2</sup> = *e*, and
+therefore *b*<sup>2</sup> = *e* too.
+
+Finally, multiply *bab* = *a* on the right by *b*: *bab*<sup>2</sup> = *ab*. Since *b*<sup>2</sup> =
+*e*, this says *ba* = *ab*, a contradiction. So every group of order 5 is abelian.
 </Proof>
 
-<Example n="6.3" title="*D*<sub>3</sub> acting on the corners">
-*D*<sub>3</sub> acts on the three corners of the triangle in [Fig. 1](#fig-1-caption). The orbit of any
-corner is all three corners, and the stabiliser of a corner has two elements: the identity, and the
-reflection in the axis through that corner. Indeed 3 · 2 = 6.
-</Example>
+Since *S*<sub>3</sub> is not abelian, 6 is the smallest order of a group that is not abelian.
 
-## The Sylow theorems
+<Questions>
+<Question answer-ctx="Setting: G = {e, a, b, ab, ba} with ab ≠ ba, these five distinct (Theorem 7.2, order 5). Expected: bab is one of the five. bab = e gives b(ab) = e and (ba)b = e, so ab and ba are both inverses of b, hence equal (Proposition 4.7): contradiction. bab = b gives ab = e (cancel b on the left), excluded by Lemma 7.1. bab = ab gives ba = a (cancel b on the right), so b = e. bab = ba gives b = e (cancel ba on the left). Hence bab = a. Check that all four alternatives are ruled out with the correct side of cancellation.">
+Complete the case of order 5 by showing directly that *bab* = *a*.
+</Question>
 
-Lagrange’s theorem limits which subgroups can exist. Sylow’s theorems go the other way: for prime powers
-they guarantee that subgroups exist, and they constrain how many there are.
+<Question answer-ctx="In S_3 (Example 1.3): f1 is the identity; f2: 1↦2, 2↦1, 3↦3; f3: 1↦3, 2↦2, 3↦1; f4: 1↦1, 2↦3, 3↦2; f5: 1↦2, 2↦3, 3↦1; f6: 1↦3, 2↦1, 3↦2. The product fg means apply g first, then f. Expected: for example a = f2, b = f5: ab = f2f5 = f4 and ba = f5f2 = f3, so the five elements f1, f2, f5, f4, f3 are distinct. Any non-commuting pair works; every pair of distinct non-identity elements except {f5, f6} fails to commute. Check the products against the composition convention.">
+Find elements *a* and *b* of *S*<sub>3</sub> with *ab* ≠ *ba*, and check that *e*, *a*, *b*, *ab*
+and *ba* are five distinct elements of *S*<sub>3</sub>.
+</Question>
 
-<Theorem n="7.1" name="Sylow" title="Sylow’s theorems">
-Let |*G*| = *p*<sup>*a*</sup>*m*, where *p* is prime and does not divide *m*. Then
+<Question answer-ctx="Expected: a^2 lies in {e, a, b}. a^2 = a would give a = e. If a^2 = e then a = a^(−1); ab lies in {e, a, b}: ab = a gives b = e, ab = b gives a = e, and ab = e gives b = a^(−1) = a; all impossible. So a^2 = b. Table (row x, column y, entry xy): e: e, a, b; a: a, b, e; b: b, e, a. Check that a^2 = e is ruled out with care, since that case needs the extra argument about ab.">
+Let *G* = \{*e*, *a*, *b*\} be a group of order 3. Show that *a*<sup>2</sup> = *b*, and write down
+the multiplication table of *G*.
+</Question>
 
-1. *G* has a subgroup of order *p*<sup>*a*</sup>, called a **Sylow *p*-subgroup**;
-2. any two Sylow *p*-subgroups are conjugate in *G*;
-3. their number *n*<sub>*p*</sub> satisfies *n*<sub>*p*</sub> ≡ 1 (mod *p*) and *n*<sub>*p*</sub> divides *m*.
-</Theorem>
+<Question answer-ctx="Expected: if ab = ba then aba^(−1)b^(−1) = baa^(−1)b^(−1) = bb^(−1) = e. Conversely, if aba^(−1)b^(−1) = e, multiply on the right by b, then by a, to get ab = ba. Check that both directions are proved and that associativity is used correctly.">
+Show that elements *a* and *b* of a group commute if and only if *aba*<sup>−1</sup>*b*<sup>−1</sup>
+= *e*.
+</Question>
 
-<Example n="7.2" title="Groups of order 15 are cyclic">
-Every group of order 15 is cyclic. Here *n*<sub>3</sub> divides 5 and is 1 modulo 3, so
-*n*<sub>3</sub> = 1; and *n*<sub>5</sub> divides 3 and is 1 modulo 5, so *n*<sub>5</sub> = 1. Each Sylow
-subgroup is therefore normal, the two meet only in the identity, and *G* is their direct product
-*C*<sub>3</sub> × *C*<sub>5</sub> ≅ *C*<sub>15</sub>.
-</Example>
+<Question answer-ctx="Expected: from ab = ba, multiply on the left and on the right by a^(−1): a^(−1)(ab)a^(−1) = a^(−1)(ba)a^(−1), which simplifies to ba^(−1) = a^(−1)b. So a^(−1) and b commute.">
+Show that if *a* and *b* commute, then so do *a*<sup>−1</sup> and *b*.
+</Question>
 
-## Problems
-
-<Problems>
-1. Show that a group in which *g*<sup>2</sup> = *e* for every element *g* is abelian.
-2. Prove that every group of order 4 is isomorphic either to *C*<sub>4</sub> or to *C*<sub>2</sub> × *C*<sub>2</sub>.
-3. Find every subgroup of ℤ/12ℤ, and draw the lattice they form under inclusion.
-4. Let *G* be a finite group acting on a finite set *X*. Prove that the number of orbits equals the average, over *g* ∈ *G*, of the number of points fixed by *g*.
-5. Prove that a group of order *p*<sup>2</sup>, with *p* prime, is abelian.
-6. Show that the alternating group *A*<sub>4</sub> has no subgroup of order 6.
-</Problems>
+<Question answer-ctx="Expected: induction on n. n = 1 is clear. If (ab)^n = a^n b^n, then (ab)^(n+1) = a^n b^n a b. Since ab = ba, b^n a = a b^n (itself by induction, moving a past one b at a time), so this is a^n a b^n b = a^(n+1) b^(n+1). Check that the step b^n a = a b^n is justified, not just asserted; it is where commutativity is used.">
+Show that if *a* and *b* commute, then (*ab*)<sup>*n*</sup> = *a*<sup>*n*</sup>*b*<sup>*n*</sup> for
+every positive integer *n*.
+</Question>
+</Questions>
