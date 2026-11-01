@@ -226,8 +226,8 @@
 .questions li.question > p { margin-top: 0; }
 .questions li.question > p + p { margin-top: 0.5rem; }
 
-/* The video a section follows: a play mark in the margin, its title as the link, and where it goes.
-   It opens YouTube; nothing is embedded. */
+/* The video a section follows: a play mark in the margin, its title as the link, and its running time.
+   Chosen, it plays in the full-screen video view (VideoView.astro); it remains a link to YouTube. */
 
 .prose a.video {
   display: grid;

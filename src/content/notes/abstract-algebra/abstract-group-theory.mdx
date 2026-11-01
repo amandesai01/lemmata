@@ -1,6 +1,6 @@
 ---
 title: Abstract Group Theory
-description: Lecture notes on abstract group theory, from motivating examples to the axioms and the first properties of groups.
+description: Lecture notes on abstract group theory, from motivating examples and the axioms to subgroups, cyclic groups and homomorphisms.
 area: abstract-algebra
 figure: symmetry
 ---
@@ -846,5 +846,468 @@ Show that if *a* and *b* commute, then so do *a*<sup>−1</sup> and *b*.
 <Question answer-ctx="Expected: induction on n. n = 1 is clear. If (ab)^n = a^n b^n, then (ab)^(n+1) = a^n b^n a b. Since ab = ba, b^n a = a b^n (itself by induction, moving a past one b at a time), so this is a^n a b^n b = a^(n+1) b^(n+1). Check that the step b^n a = a b^n is justified, not just asserted; it is where commutativity is used.">
 Show that if *a* and *b* commute, then (*ab*)<sup>*n*</sup> = *a*<sup>*n*</sup>*b*<sup>*n*</sup> for
 every positive integer *n*.
+</Question>
+</Questions>
+
+## Subgroups
+
+<Video id="uqMFcwi8PsY" title="Subgroups" duration="33:21" />
+
+A subgroup is a subset of a group that is itself a group under the same operation.
+
+<Definition n="8.1" title="Subgroup">
+A subset *H* of a group *G* is a **subgroup** of *G*, written *H* ≤ *G*, if
+
+1. *H* is closed under the operation of *G*: if *a*, *b* ∈ *H* then *ab* ∈ *H*;
+2. the identity *e* of *G* lies in *H*;
+3. *H* is closed under inverses: if *a* ∈ *H* then *a*<sup>−1</sup> ∈ *H*.
+</Definition>
+
+Each condition asks something of *H*: the product *ab* and the inverse *a*<sup>−1</sup> always lie in *G*,
+but need not lie in *H*. A subgroup is a group under the operation of *G*. It has a binary operation,
+an identity and inverses by (i)–(iii), and associativity comes for free: three elements of *H* are
+elements of *G*, where the operation is associative.
+
+<Example n="8.2" title="Subgroups of groups of numbers">
+Under addition, ℤ is a subgroup of ℚ, and ℚ is a subgroup of ℝ and of ℂ. Under multiplication,
+ℚ<sup>∗</sup> is a subgroup of ℝ<sup>∗</sup> and of ℂ<sup>∗</sup>. But ℤ<sup>∗</sup> is not a subgroup of
+ℚ<sup>∗</sup>: it is closed under multiplication and contains 1, but 2 has no inverse in it, which is
+why it is not a group (Example 2.6).
+</Example>
+
+<Example n="8.3" title="Even and odd integers">
+The even integers 2ℤ = \{2*n* : *n* ∈ ℤ\} form a subgroup of ℤ: a sum of even integers is even, 0 is
+even, and the negative of an even integer is even. The odd integers do not: 3 + 3 = 6 is even, so
+they are not closed under addition, and 0 is not odd.
+</Example>
+
+<Proposition n="8.4" title="Multiples of an integer form a subgroup">
+For every integer *a*, the set *a*ℤ = \{*an* : *n* ∈ ℤ\} of multiples of *a* is a subgroup of ℤ.
+</Proposition>
+
+<Proof>
+It is closed under addition, since *an* + *am* = *a*(*n* + *m*). It contains 0 = *a* · 0. It is closed
+under inverses, since −(*an*) = *a*(−*n*).
+</Proof>
+
+For instance 3ℤ = \{…, −6, −3, 0, 3, 6, 9, …\}. These are all the subgroups of ℤ.
+
+<Theorem n="8.5" title="The subgroups of the integers">
+Every subgroup of ℤ is *a*ℤ for some integer *a* ≥ 0.
+</Theorem>
+
+<Proof>
+Let *H* ≤ ℤ. If *H* = \{0\}, then *H* = 0ℤ.
+
+Otherwise *H* contains some *n* ≠ 0. Since *H* is closed under inverses it contains −*n* as well, and
+one of *n* and −*n* is positive. So *H* contains a positive integer, and therefore a least positive
+integer *a*: try 1, 2, 3, … in turn, and *a* is the first that lies in *H*.
+
+Every multiple of *a* lies in *H*: 0 does, *ka* = *a* + ⋯ + *a* does for *k* > 0 by closure, and
+−*ka* does since *H* is closed under inverses. So *a*ℤ ⊆ *H*.
+
+Conversely let *b* ∈ *H* with *b* > 0. Divide *b* by *a*: *b* = *ap* + *q* with *p* an integer and
+0 ≤ *q* &lt; *a*. Since *ap* ∈ *H*, also −*ap* ∈ *H*, and so *q* = *b* + (−*ap*) ∈ *H*. As *q* &lt; *a*
+and *a* is the least positive integer in *H*, *q* is not positive, so *q* = 0 and *b* = *ap* ∈ *a*ℤ.
+If *b* &lt; 0 then −*b* ∈ *H* is positive, so −*b* = *ap* and *b* = *a*(−*p*). And 0 ∈ *a*ℤ. So
+*H* ⊆ *a*ℤ, and *H* = *a*ℤ.
+</Proof>
+
+On the number line, the first element of *H* to the right of 0 is *a*, and nothing in *H* lies between
+two consecutive multiples of *a*: an element strictly between *ka* and (*k* + 1)*a*, less *ka*, would be
+an element of *H* strictly between 0 and *a*.
+
+<Example n="8.6" title="The trivial subgroup and the whole group">
+Every group *G* has two subgroups: the **trivial subgroup** \{*e*\}, and *G* itself. The subgroups of
+interest are usually the others.
+</Example>
+
+<Questions>
+<Question answer-ctx="Expected: no. The set {0, 1, 2, …} is closed under addition and contains 0, but it is not closed under inverses: 1 is in it and −1 is not. Check that the failing condition is identified with an example.">
+Is the set \{0, 1, 2, …\} of non-negative integers a subgroup of ℤ?
+</Question>
+
+<Question answer-ctx="Expected: yes. The set {1, i, −1, −i} is closed under multiplication (products of powers of i are powers of i, with i^4 = 1), contains 1, and each element has its inverse in the set: 1 and −1 are their own inverses, and i and −i are inverses of each other. Check all three conditions of Definition 8.1.">
+Show that \{1, *i*, −1, −*i*\} is a subgroup of ℂ<sup>∗</sup>.
+</Question>
+
+<Question answer-ctx="Expected: ℚ^+ is a subgroup of ℚ^∗: a product of positive rationals is positive, 1 is positive, and 1/r is positive when r is. The negative rationals together with 1 are not: (−1)(−2) = 2 is not in the set, so it is not closed. Check both parts.">
+Show that ℚ<sup>+</sup> is a subgroup of ℚ<sup>∗</sup>. Is the set of negative rational numbers together
+with 1 a subgroup of ℚ<sup>∗</sup>?
+</Question>
+
+<Question answer-ctx="Expected: aℤ ⊆ bℤ if and only if b divides a. If a = bk then every multiple an = b(kn) lies in bℤ. Conversely, if aℤ ⊆ bℤ then a = a · 1 ∈ bℤ, so a = bk for some k. In particular 4ℤ ⊆ 2ℤ since 2 divides 4. Check both directions.">
+Show that *a*ℤ ⊆ *b*ℤ if and only if *b* divides *a*.
+</Question>
+
+<Question answer-ctx="Expected: let H and K be subgroups of G. If a, b ∈ H ∩ K then ab lies in H and in K, so in H ∩ K; e lies in both; and a^(−1) lies in both. So H ∩ K is a subgroup. For 6ℤ ∩ 4ℤ: it is the set of common multiples of 6 and 4, which is 12ℤ (a = 12). Check that the intersection is shown to be exactly 12ℤ, for example by Theorem 8.5 with 12 the least positive common multiple, or directly.">
+Show that the intersection of two subgroups of a group is a subgroup. Find the integer *a* ≥ 0 with
+6ℤ ∩ 4ℤ = *a*ℤ.
+</Question>
+
+<Question answer-ctx="Expected: not a subgroup: 6 and 4 lie in the union but 6 + 4 = 10 is neither a multiple of 6 nor of 4, so the union is not closed under addition. A concrete counterexample suffices.">
+Show that 6ℤ ∪ 4ℤ is not a subgroup of ℤ.
+</Question>
+
+<Question answer-ctx="Expected: the set {6m + 4n : m, n ∈ ℤ} is closed under addition, contains 0 = 6·0 + 4·0, and contains −(6m + 4n) = 6(−m) + 4(−n), so it is a subgroup of ℤ. Every element is even, and 2 = 6·1 + 4·(−1) lies in it, so it contains 2ℤ; hence it is 2ℤ, and a = 2. Check that both inclusions are shown.">
+Show that \{6*m* + 4*n* : *m*, *n* ∈ ℤ\} is a subgroup of ℤ, and find the integer *a* ≥ 0 for which it
+equals *a*ℤ.
+</Question>
+</Questions>
+
+## Cyclic groups, centres and centralisers
+
+<Video id="6rCR0A1gYUI" title="Types of groups" duration="30:03" />
+
+<Definition n="9.1" title="Subgroup generated by an element">
+Let *a* be an element of a group *G*. The **subgroup generated by *a*** is the set of all powers of *a*,
+
+<Display>⟨*a*⟩ = \{*a*<sup>*n*</sup> : *n* ∈ ℤ\} = \{…, *a*<sup>−2</sup>, *a*<sup>−1</sup>, *e*, *a*, *a*<sup>2</sup>, …\}.</Display>
+</Definition>
+
+<Proposition n="9.2" title="The smallest subgroup containing an element">
+⟨*a*⟩ is a subgroup of *G*, and every subgroup of *G* that contains *a* contains ⟨*a*⟩.
+</Proposition>
+
+<Proof>
+By the usual rules for exponents, *a*<sup>*m*</sup>*a*<sup>*n*</sup> = *a*<sup>*m*+*n*</sup> and
+(*a*<sup>*n*</sup>)<sup>−1</sup> = *a*<sup>−*n*</sup> for all integers *m* and *n*. So a product of powers of
+*a* is a power of *a*, the identity *e* = *a*<sup>0</sup> is one, and the inverse of a power of *a* is
+one; ⟨*a*⟩ is a subgroup. If *H* ≤ *G* contains *a*, it contains *a*<sup>−1</sup> and *e*, and by closure
+every product of copies of *a* or of copies of *a*<sup>−1</sup>, which is every power of *a*.
+</Proof>
+
+<Definition n="9.3" title="Cyclic group">
+A group *G* is **cyclic** if *G* = ⟨*a*⟩ for some *a* ∈ *G*. Such an *a* is a **generator** of *G*, and
+*G* is said to be generated by *a*.
+</Definition>
+
+<Example n="9.4" title="The integers are cyclic">
+In ℤ under addition the powers of *a* are its multiples *na*, so ⟨*a*⟩ = *a*ℤ. Thus ℤ = ⟨1⟩ = ⟨−1⟩ is
+cyclic, with generators 1 and −1. But ⟨2⟩ = 2ℤ ≠ ℤ, so 2 is not a generator. No other integer generates
+ℤ: if *a*ℤ = ℤ then 1 ∈ *a*ℤ, so *a* divides 1 and *a* = ±1.
+</Example>
+
+<Definition n="9.5" title="Order of an element">
+The **order** of an element *a*, written ord(*a*), is the order |⟨*a*⟩| of the subgroup it generates when
+that subgroup is finite. Otherwise *a* has **infinite order**.
+</Definition>
+
+<Example n="9.6" title="Orders in the integers and in S3">
+In any group ⟨*e*⟩ = \{*e*\}, so ord(*e*) = 1. In ℤ, ord(0) = 1, and every *a* ≠ 0 has infinite order,
+since *a*ℤ is infinite.
+
+In *S*<sub>3</sub>, with the elements of Example 1.3, *f*<sub>2</sub><sup>2</sup> = *f*<sub>1</sub>, so
+⟨*f*<sub>2</sub>⟩ = \{*f*<sub>1</sub>, *f*<sub>2</sub>\} and ord(*f*<sub>2</sub>) = 2; likewise
+ord(*f*<sub>3</sub>) = ord(*f*<sub>4</sub>) = 2. And ⟨*f*<sub>5</sub>⟩ = ⟨*f*<sub>6</sub>⟩ =
+\{*f*<sub>1</sub>, *f*<sub>5</sub>, *f*<sub>6</sub>\}, so ord(*f*<sub>5</sub>) = ord(*f*<sub>6</sub>) = 3.
+So *S*<sub>3</sub> has one element of order 1, three of order 2 and two of order 3. None of them
+generates all six elements, so *S*<sub>3</sub> is not cyclic.
+</Example>
+
+<Proposition n="9.7" title="Finite cyclic groups">
+A finite group *G* of order *n* is cyclic if and only if it has an element of order *n*.
+</Proposition>
+
+<Proof>
+If *G* = ⟨*a*⟩ then ord(*a*) = |⟨*a*⟩| = |*G*| = *n*. Conversely, if ord(*a*) = *n* then ⟨*a*⟩ is a
+subset of *G* with *n* elements, as many as *G* has, so ⟨*a*⟩ = *G*.
+</Proof>
+
+<Proposition n="9.8" title="A group without other subgroups is cyclic">
+If the only subgroups of *G* are \{*e*\} and *G*, then *G* is cyclic.
+</Proposition>
+
+<Proof>
+If *G* = \{*e*\}, then *G* = ⟨*e*⟩. Otherwise take *a* ∈ *G* with *a* ≠ *e*. The subgroup ⟨*a*⟩ contains
+*a*, so it is not \{*e*\}, and it must therefore be *G*.
+</Proof>
+
+<Definition n="9.9" title="Centre">
+The **centre** of a group *G* is the set of elements that commute with every element of *G*:
+
+<Display>*Z*(*G*) = \{*g* ∈ *G* : *ag* = *ga* for all *a* ∈ *G*\}.</Display>
+</Definition>
+
+<Proposition n="9.10" title="The centre is a subgroup">
+*Z*(*G*) is a subgroup of *G*.
+</Proposition>
+
+<Proof>
+Let *g*<sub>1</sub>, *g*<sub>2</sub> ∈ *Z*(*G*) and *a* ∈ *G*. Using associativity at each step,
+
+<Display>(*g*<sub>1</sub>*g*<sub>2</sub>)*a* = *g*<sub>1</sub>(*g*<sub>2</sub>*a*) = *g*<sub>1</sub>(*ag*<sub>2</sub>) = (*g*<sub>1</sub>*a*)*g*<sub>2</sub> = (*ag*<sub>1</sub>)*g*<sub>2</sub> = *a*(*g*<sub>1</sub>*g*<sub>2</sub>),</Display>
+
+so *g*<sub>1</sub>*g*<sub>2</sub> ∈ *Z*(*G*). The identity commutes with everything, so *e* ∈ *Z*(*G*). For an
+inverse, recall that (*xy*)<sup>−1</sup> = *y*<sup>−1</sup>*x*<sup>−1</sup>, by Proposition 4.8, since
+(*xy*)(*y*<sup>−1</sup>*x*<sup>−1</sup>) = *e*. If *g* ∈ *Z*(*G*) and *a* ∈ *G*, then
+
+<Display>*g*<sup>−1</sup>*a* = (*a*<sup>−1</sup>*g*)<sup>−1</sup> = (*ga*<sup>−1</sup>)<sup>−1</sup> = *ag*<sup>−1</sup>,</Display>
+
+so *g*<sup>−1</sup> ∈ *Z*(*G*).
+</Proof>
+
+<Definition n="9.11" title="Centraliser">
+The **centraliser** of an element *a* of *G* is the set of elements that commute with *a*:
+
+<Display>*C*(*a*) = \{*g* ∈ *G* : *ag* = *ga*\}.</Display>
+</Definition>
+
+The centre asks an element to commute with everything; the centraliser of *a* asks only that it commute
+with *a*.
+
+<Questions>
+<Question answer-ctx="Expected: if g, h ∈ C(a) then a(gh) = (ag)h = (ga)h = g(ah) = g(ha) = (gh)a, so gh ∈ C(a); ae = ea, so e ∈ C(a); if ag = ga, multiplying on the left and on the right by g^(−1) gives g^(−1)a = ag^(−1), so g^(−1) ∈ C(a). Check that associativity is used and the inverse step is justified.">
+Show that the centraliser *C*(*a*) is a subgroup of *G* for every *a* ∈ *G*.
+</Question>
+
+<Question answer-ctx="Expected: an element of Z(G) commutes with every element, in particular with a, so Z(G) ⊆ C(a) for every a. Conversely an element in every C(a) commutes with every a, so lies in Z(G); hence Z(G) is the intersection of all the C(a). Check both inclusions for the second part.">
+Show that *Z*(*G*) ⊆ *C*(*a*) for every *a* ∈ *G*, and that *Z*(*G*) is the intersection of all the
+centralisers *C*(*a*).
+</Question>
+
+<Question answer-ctx="Expected: if G is abelian, every g satisfies ag = ga for all a, so Z(G) = G and C(a) = G for every a. Conversely, Z(G) = G means every pair commutes, so G is abelian. The question asks only the first direction; the converse is a bonus.">
+Show that if *G* is abelian then *Z*(*G*) = *G*, and *C*(*a*) = *G* for every *a* ∈ *G*.
+</Question>
+
+<Question answer-ctx="In S_3 (Example 1.3): f1 is the identity; f2: 1↦2, 2↦1, 3↦3; f3: 1↦3, 2↦2, 3↦1; f4: 1↦1, 2↦3, 3↦2; f5: 1↦2, 2↦3, 3↦1; f6: 1↦3, 2↦1, 3↦2. The product fg means apply g first, then f. Expected: Z(S_3) = {f1}. C(f2) = {f1, f2}, and C(f5) = {f1, f5, f6}. Each non-identity element must be shown to fail to commute with some element, for example f2f5 = f4 but f5f2 = f3, and f2f3 = f6 but f3f2 = f5. Check the products are computed with the stated order of composition.">
+Find the centre of *S*<sub>3</sub>, and the centralisers *C*(*f*<sub>2</sub>) and *C*(*f*<sub>5</sub>), with the
+elements of Example 1.3.
+</Question>
+
+<Question answer-ctx="Expected: a power of a^(−1) is (a^(−1))^n = a^(−n), a power of a, and conversely a^n = (a^(−1))^(−n); so ⟨a⟩ = ⟨a^(−1)⟩ and therefore ord(a) = ord(a^(−1)), the two subgroups being equal (finite or infinite together). Check that both inclusions are shown.">
+Show that ⟨*a*⟩ = ⟨*a*<sup>−1</sup>⟩, and deduce that ord(*a*) = ord(*a*<sup>−1</sup>).
+</Question>
+
+<Question answer-ctx="Expected: if G = ⟨a⟩, any two elements are a^m and a^n, and a^m a^n = a^(m+n) = a^n a^m. So G is abelian. Check that the exponent rule is the justification.">
+Show that every cyclic group is abelian.
+</Question>
+
+<Question answer-ctx="G_n = {1, θ_n, …, θ_n^(n−1)} with θ_n = cos(2π/n) + i sin(2π/n). Expected: G_n = ⟨θ_n⟩ by its definition, so it is cyclic. The generators of G_4 = {1, i, −1, −i} are i and −i: ⟨i⟩ = ⟨−i⟩ = G_4, while ⟨1⟩ = {1} and ⟨−1⟩ = {1, −1}. Check each element of G_4 is tested.">
+Show that the group *G*<sub>*n*</sub> of *n*th roots of unity is cyclic, and find every generator of
+*G*<sub>4</sub>.
+</Question>
+</Questions>
+
+## Group homomorphisms
+
+<Video id="l3tJXbgJXoE" title="Group homomorphisms and examples" duration="34:42" />
+
+<Definition n="10.1" title="Homomorphism">
+Let *G* and *G*′ be groups. A **homomorphism** from *G* to *G*′ is a function *φ* : *G* → *G*′ such that
+
+<Display>*φ*(*ab*) = *φ*(*a*)*φ*(*b*) for all *a*, *b* ∈ *G*.</Display>
+</Definition>
+
+On the left the product *ab* is taken in *G*; on the right the product of *φ*(*a*) and *φ*(*b*) is taken
+in *G*′. A homomorphism respects the two operations: multiplying first and then applying *φ* gives the
+same result as applying *φ* first and then multiplying.
+
+<Example n="10.2" title="Multiplication by a fixed integer">
+Fix an integer *n* and let *φ* : ℤ → ℤ be *φ*(*a*) = *na*. Since both groups are under addition, the
+condition reads *φ*(*a* + *b*) = *φ*(*a*) + *φ*(*b*), and indeed *n*(*a* + *b*) = *na* + *nb*. So *φ* is a
+homomorphism.
+</Example>
+
+<Example n="10.3" title="Parity">
+The set \{1, −1\} is a group under multiplication; it is a subgroup of ℚ<sup>∗</sup>. Define
+*φ* : ℤ → \{1, −1\} by *φ*(*a*) = 1 if *a* is even and *φ*(*a*) = −1 if *a* is odd. The operation is
+addition in ℤ and multiplication in \{1, −1\}, so the condition is *φ*(*a* + *b*) = *φ*(*a*)*φ*(*b*). If *a*
+and *b* are both even, so is *a* + *b*, and 1 = 1 · 1. If both are odd, *a* + *b* is even, and
+1 = (−1)(−1). If one is even and the other odd, *a* + *b* is odd, and −1 = 1 · (−1). So *φ* is a
+homomorphism.
+</Example>
+
+<Example n="10.4" title="The determinant">
+The determinant det : GL<sub>*n*</sub>(ℝ) → ℝ<sup>∗</sup> takes values in ℝ<sup>∗</sup>, because an invertible
+matrix has non-zero determinant. Both groups are under multiplication, and det(*AB*) = det(*A*) det(*B*),
+so the determinant is a homomorphism.
+</Example>
+
+<Example n="10.5" title="The powers of a fixed element">
+Let *G* be a group, fix *a* ∈ *G*, and define *φ* : ℤ → *G* by *φ*(*n*) = *a*<sup>*n*</sup>. Here the
+condition is *φ*(*m* + *n*) = *φ*(*m*)*φ*(*n*), that is, *a*<sup>*m*+*n*</sup> = *a*<sup>*m*</sup>*a*<sup>*n*</sup>,
+which is the rule for exponents. So *φ* is a homomorphism.
+</Example>
+
+<Example n="10.6" title="Squaring in an abelian group">
+Let *G* be abelian and *φ* : *G* → *G* be *φ*(*a*) = *a*<sup>2</sup>. Then *φ*(*ab*) = (*ab*)<sup>2</sup> =
+*abab* and *φ*(*a*)*φ*(*b*) = *aabb*. In general these differ, but since *ba* = *ab* the middle two
+factors may be exchanged: *abab* = *aabb*. So squaring is a homomorphism of an abelian group.
+</Example>
+
+The proof used that *G* is abelian, but that alone does not show squaring fails in other groups; an
+example is needed. By Theorem 7.2 the smallest group that is not abelian is *S*<sub>3</sub>.
+
+<Example n="10.7" title="Squaring in S3 is not a homomorphism">
+In *S*<sub>3</sub>, with the elements of Example 1.3, let *φ*(*f*) = *f*<sup>2</sup>. The product
+*f*<sub>2</sub>*f*<sub>3</sub> sends 1 to 3, 2 to 1 and 3 to 2, so *f*<sub>2</sub>*f*<sub>3</sub> =
+*f*<sub>6</sub>, and *φ*(*f*<sub>2</sub>*f*<sub>3</sub>) = *f*<sub>6</sub><sup>2</sup> = *f*<sub>5</sub>, which is
+not the identity since *f*<sub>6</sub> has order 3. But *f*<sub>2</sub> and *f*<sub>3</sub> have order 2, so
+*φ*(*f*<sub>2</sub>)*φ*(*f*<sub>3</sub>) = *f*<sub>1</sub>*f*<sub>1</sub> = *f*<sub>1</sub>. Hence *φ* is not a
+homomorphism.
+</Example>
+
+<Questions>
+<Question answer-ctx="Expected: ψ(a) = −1 for even a and 1 for odd a. For example a = b = 0: ψ(0 + 0) = ψ(0) = −1, but ψ(0)ψ(0) = (−1)(−1) = 1. Or a = b = 1: ψ(2) = −1 but ψ(1)ψ(1) = 1. Equivalently, a homomorphism must send 0 to the identity 1 of {1, −1}, and ψ(0) = −1. One explicit failing pair suffices.">
+Show that the map *ψ* : ℤ → \{1, −1\} with *ψ*(*a*) = −1 for even *a* and *ψ*(*a*) = 1 for odd *a* is not a
+homomorphism.
+</Question>
+
+<Question answer-ctx="Expected: for m, n ≥ 0 this is counting factors (associativity). For negative exponents write a^(−k) = (a^(−1))^k and cancel pairs a a^(−1) = e: for example if m ≥ 0 > n with m + n ≥ 0, a^m a^n = a^m (a^(−1))^(−n) leaves m + n copies of a. All sign cases must be covered, or an induction argument given. Check that the cases with negative exponents are actually handled.">
+Show that *a*<sup>*m*+*n*</sup> = *a*<sup>*m*</sup>*a*<sup>*n*</sup> for all integers *m* and *n*, including negative
+ones.
+</Question>
+
+<Question answer-ctx="Expected: φ(x) = 2^x maps ℝ to the positive reals, and φ(x + y) = 2^(x+y) = 2^x · 2^y = φ(x)φ(y), the operation being addition on the left and multiplication on the right. Check that the two operations are named correctly.">
+Show that *x* ↦ 2<sup>*x*</sup> is a homomorphism from ℝ under addition to ℝ<sup>+</sup> under multiplication.
+</Question>
+
+<Question answer-ctx="Expected: x ↦ |x| on ℝ^∗ is a homomorphism, since |xy| = |x||y|. The map ℤ → ℤ, n ↦ n + 1 is not: (m + n) + 1 ≠ (m + 1) + (n + 1), for example m = n = 0 gives 1 ≠ 2; also 0 does not go to 0. Check both parts.">
+Is *x* ↦ |*x*| a homomorphism from ℝ<sup>∗</sup> to ℝ<sup>∗</sup>? Is *n* ↦ *n* + 1 a homomorphism from ℤ
+to ℤ?
+</Question>
+
+<Question answer-ctx="Expected: if φ : G → G′ and ψ : G′ → G″ are homomorphisms, then (ψ∘φ)(ab) = ψ(φ(a)φ(b)) = ψ(φ(a))ψ(φ(b)) = (ψ∘φ)(a)(ψ∘φ)(b). Check that each homomorphism property is applied in its own group.">
+Show that if *φ* : *G* → *G*′ and *ψ* : *G*′ → *G*″ are homomorphisms, then so is *ψ* ∘ *φ*.
+</Question>
+
+<Question answer-ctx="Expected: for φ(a) = a^(−1): φ(ab) = (ab)^(−1) = b^(−1)a^(−1), while φ(a)φ(b) = a^(−1)b^(−1). These agree for all a, b iff b^(−1)a^(−1) = a^(−1)b^(−1) for all a, b; taking inverses, iff ab = ba for all a, b (as a and b range over G so do their inverses). So φ is a homomorphism iff G is abelian. Check both directions.">
+Show that *a* ↦ *a*<sup>−1</sup> is a homomorphism from *G* to *G* if and only if *G* is abelian.
+</Question>
+
+<Question answer-ctx="Expected: if (ab)^2 = a^2 b^2 for all a, b, then abab = aabb; cancelling a on the left and b on the right gives ba = ab. So G is abelian. This is the converse of Example 10.6. Check that cancellation is used on the correct sides.">
+Show that if *a* ↦ *a*<sup>2</sup> is a homomorphism from *G* to *G*, then *G* is abelian.
+</Question>
+</Questions>
+
+## Kernels and images
+
+<Video id="LNYaIdZTqDs" title="Properties of homomorphisms" duration="37:15" />
+
+Write *e*<sub>*G*</sub> and *e*<sub>*G*′</sub> for the identities of *G* and *G*′.
+
+<Proposition n="11.1" title="Homomorphisms preserve the identity and inverses">
+If *φ* : *G* → *G*′ is a homomorphism, then *φ*(*e*<sub>*G*</sub>) = *e*<sub>*G*′</sub>, and
+*φ*(*a*<sup>−1</sup>) = *φ*(*a*)<sup>−1</sup> for every *a* ∈ *G*.
+</Proposition>
+
+<Proof>
+Since *e*<sub>*G*</sub>*e*<sub>*G*</sub> = *e*<sub>*G*</sub>, applying *φ* gives
+*φ*(*e*<sub>*G*</sub>)*φ*(*e*<sub>*G*</sub>) = *φ*(*e*<sub>*G*</sub>), an equation in *G*′. Multiplying on the left
+by *φ*(*e*<sub>*G*</sub>)<sup>−1</sup> and using associativity gives *φ*(*e*<sub>*G*</sub>) = *e*<sub>*G*′</sub>.
+
+For the second, *aa*<sup>−1</sup> = *e*<sub>*G*</sub>, so *φ*(*a*)*φ*(*a*<sup>−1</sup>) = *φ*(*e*<sub>*G*</sub>) =
+*e*<sub>*G*′</sub>. By Proposition 4.8, *φ*(*a*<sup>−1</sup>) is the inverse of *φ*(*a*).
+</Proof>
+
+These conditions are necessary, so a map that fails one of them is not a homomorphism. They are not
+sufficient: a map can send the identity to the identity without being a homomorphism.
+
+<Example n="11.2" title="Parity the wrong way round">
+Let *ψ* : ℤ → \{1, −1\} send even integers to −1 and odd integers to 1. The identity of ℤ is 0, which is
+even, so *ψ*(0) = −1, while the identity of \{1, −1\} is 1. By Proposition 11.1, *ψ* is not a
+homomorphism.
+</Example>
+
+<Definition n="11.3" title="Kernel and image">
+Let *φ* : *G* → *G*′ be a homomorphism. Its **kernel** is the set of elements sent to the identity,
+
+<Display>ker *φ* = \{*a* ∈ *G* : *φ*(*a*) = *e*<sub>*G*′</sub>\} ⊆ *G*,</Display>
+
+and its **image** is the set of values it takes,
+
+<Display>im *φ* = \{*φ*(*a*) : *a* ∈ *G*\} ⊆ *G*′.</Display>
+</Definition>
+
+<Proposition n="11.4" title="Kernels and images are subgroups">
+If *φ* : *G* → *G*′ is a homomorphism, then ker *φ* is a subgroup of *G* and im *φ* is a subgroup of
+*G*′.
+</Proposition>
+
+<Proof>
+If *a*, *b* ∈ ker *φ*, then *φ*(*ab*) = *φ*(*a*)*φ*(*b*) = *e*<sub>*G*′</sub>*e*<sub>*G*′</sub> = *e*<sub>*G*′</sub>, so
+*ab* ∈ ker *φ*. By Proposition 11.1, *φ*(*e*<sub>*G*</sub>) = *e*<sub>*G*′</sub>, so *e*<sub>*G*</sub> ∈ ker *φ*; and
+if *a* ∈ ker *φ* then *φ*(*a*<sup>−1</sup>) = *φ*(*a*)<sup>−1</sup> = *e*<sub>*G*′</sub><sup>−1</sup> = *e*<sub>*G*′</sub>, so
+*a*<sup>−1</sup> ∈ ker *φ*.
+
+For the image, *φ*(*a*)*φ*(*b*) = *φ*(*ab*) is again a value of *φ*; *e*<sub>*G*′</sub> = *φ*(*e*<sub>*G*</sub>) is
+one; and *φ*(*a*)<sup>−1</sup> = *φ*(*a*<sup>−1</sup>) is one.
+</Proof>
+
+<Example n="11.5" title="Multiplication by a fixed integer">
+For *φ*(*a*) = *na* on ℤ (Example 10.2) with *n* ≠ 0, the kernel is \{*a* : *na* = 0\} = \{0\}, and the
+image is \{*na* : *a* ∈ ℤ\} = *n*ℤ.
+</Example>
+
+<Example n="11.6" title="The determinant">
+The kernel of det : GL<sub>*n*</sub>(ℝ) → ℝ<sup>∗</sup> is the set of invertible matrices with determinant 1.
+By Proposition 11.4 it is a subgroup of GL<sub>*n*</sub>(ℝ), the **special linear group**
+SL<sub>*n*</sub>(ℝ); GL<sub>*n*</sub>(ℝ) itself is the **general linear group**. The image is all of
+ℝ<sup>∗</sup>: for *r* ≠ 0, the diagonal matrix with diagonal entries *r*, 1, …, 1 is invertible and has
+determinant *r*, the product of its diagonal entries.
+</Example>
+
+<Example n="11.7" title="The powers of a fixed element">
+For *φ*(*n*) = *a*<sup>*n*</sup> from ℤ to *G* (Example 10.5), the image is \{*a*<sup>*n*</sup> : *n* ∈ ℤ\} = ⟨*a*⟩,
+the subgroup generated by *a*. The kernel \{*n* ∈ ℤ : *a*<sup>*n*</sup> = *e*\} is a subgroup of ℤ, so by
+Theorem 8.5 it is *b*ℤ for some integer *b* ≥ 0.
+</Example>
+
+The integer *b* of Example 11.7 is the order of *a*.
+
+<Proposition n="11.8" title="The order of an element as an exponent">
+Let *a* ∈ *G*, and let *b* ≥ 0 be the integer with \{*n* ∈ ℤ : *a*<sup>*n*</sup> = *e*\} = *b*ℤ. If *b* = 0, no
+positive power of *a* is *e*, and *a* has infinite order. If *b* > 0, then *b* is the least positive
+integer with *a*<sup>*b*</sup> = *e*, and ord(*a*) = *b*.
+</Proposition>
+
+<Proof>
+If *b* = 0, then *a*<sup>*n*</sup> = *e* only for *n* = 0. If *a*<sup>*i*</sup> = *a*<sup>*j*</sup> with *i* &lt; *j*,
+then *a*<sup>*j*−*i*</sup> = *e* with *j* − *i* > 0, which is impossible; so the powers of *a* are all
+distinct, ⟨*a*⟩ is infinite and *a* has infinite order.
+
+If *b* > 0, the positive integers *n* with *a*<sup>*n*</sup> = *e* are the positive multiples of *b*, of which
+*b* is the least. Any integer *n* can be written *n* = *bq* + *r* with 0 ≤ *r* &lt; *b*, and then
+*a*<sup>*n*</sup> = (*a*<sup>*b*</sup>)<sup>*q*</sup>*a*<sup>*r*</sup> = *a*<sup>*r*</sup>. So
+⟨*a*⟩ = \{*e*, *a*, …, *a*<sup>*b*−1</sup>\}, and these *b* powers are distinct, since *a*<sup>*i*</sup> =
+*a*<sup>*j*</sup> with 0 ≤ *i* &lt; *j* &lt; *b* would give *a*<sup>*j*−*i*</sup> = *e* with 0 &lt; *j* − *i* &lt; *b*.
+Hence ord(*a*) = |⟨*a*⟩| = *b*.
+</Proof>
+
+So the order of *a* is the least positive integer *m* with *a*<sup>*m*</sup> = *e*, if there is one, and
+infinite otherwise.
+
+<Questions>
+<Question answer-ctx="Expected: for the parity homomorphism φ : ℤ → {1, −1} (even ↦ 1, odd ↦ −1): ker φ = 2ℤ, the even integers; im φ = {1, −1}, since φ(0) = 1 and φ(1) = −1. Check that the kernel is identified as the set sent to the identity 1, not to −1.">
+Find the kernel and the image of the parity homomorphism of Example 10.3.
+</Question>
+
+<Question answer-ctx="Expected: φ(n) = i^n from ℤ to G_4 = {1, i, −1, −i}. Image: all of G_4 (i^0 = 1, i^1 = i, i^2 = −1, i^3 = −i). Kernel: {n : i^n = 1} = 4ℤ, since ord(i) = 4 (Proposition 11.8). Check that the kernel is 4ℤ, not just {0, 4}.">
+Find the kernel and the image of the homomorphism *φ* : ℤ → *G*<sub>4</sub> given by *φ*(*n*) = *i*<sup>*n*</sup>.
+</Question>
+
+<Question answer-ctx="Expected: if φ is one-to-one, only e_G maps to e_G′ = φ(e_G), so ker φ = {e_G}. Conversely, if ker φ = {e_G} and φ(a) = φ(b), then φ(ab^(−1)) = φ(a)φ(b)^(−1) = e_G′ (Proposition 11.1), so ab^(−1) = e_G and a = b. Check both directions, and that φ(b^(−1)) = φ(b)^(−1) is used.">
+Show that a homomorphism *φ* is one-to-one if and only if ker *φ* = \{*e*\}.
+</Question>
+
+<Question answer-ctx="Expected: for x ↦ |x| on ℝ^∗ under multiplication, the kernel is {x : |x| = 1} = {1, −1}, and the image is ℝ^+, the positive reals (every r > 0 is |r|). Check that the identity of the target is 1.">
+Find the kernel and the image of the homomorphism *x* ↦ |*x*| from ℝ<sup>∗</sup> to ℝ<sup>∗</sup>.
+</Question>
+
+<Question answer-ctx="Expected: SL_n(ℝ) = {A ∈ GL_n(ℝ) : det A = 1}. Closure: det(AB) = det A det B = 1. Identity: det I = 1. Inverses: det(A^(−1)) = 1/det A = 1. So it is a subgroup by Definition 8.1. Check that each condition uses a property of the determinant.">
+Show directly from Definition 8.1 that SL<sub>*n*</sub>(ℝ) is a subgroup of GL<sub>*n*</sub>(ℝ).
+</Question>
+
+<Question answer-ctx="G_6 = {1, θ, θ^2, θ^3, θ^4, θ^5} with θ = θ_6 = cos(π/3) + i sin(π/3), θ^6 = 1. Expected orders: ord(1) = 1; ord(θ) = ord(θ^5) = 6; ord(θ^2) = ord(θ^4) = 3; ord(θ^3) = 2 (θ^3 = −1). Each order is the least positive m with (θ^k)^m = 1, which needs 6 to divide km. Check that smaller powers are shown not to be 1.">
+Using Proposition 11.8, find the order of each element of *G*<sub>6</sub>.
+</Question>
+
+<Question answer-ctx="Expected: by Proposition 11.8, {n : a^n = e} = mℤ where m = ord(a), so a^n = e if and only if m divides n. Directly: if m divides n, a^n = (a^m)^(n/m) = e; conversely write n = mq + r with 0 ≤ r < m, then a^r = a^n (a^m)^(−q) = e, so r = 0 by minimality of m.">
+Show that if *a* has finite order *m*, then *a*<sup>*n*</sup> = *e* if and only if *m* divides *n*.
+</Question>
+
+<Question answer-ctx="Expected: if G = ⟨a⟩ and φ : G → G′ is a homomorphism, every element of im φ is φ(a^n) = φ(a)^n (φ preserves powers, including negative ones, by Proposition 11.1 and induction), so im φ = ⟨φ(a)⟩ is cyclic. Check that φ(a^n) = φ(a)^n is justified for negative n too.">
+Show that the image of a cyclic group under a homomorphism is cyclic.
 </Question>
 </Questions>

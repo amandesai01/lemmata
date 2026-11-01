@@ -8,6 +8,7 @@ import { figures } from '../../components/notes/figures';
 import { listStatements } from '../../components/notes/statements';
 import StatementPeek from '../../components/notes/StatementPeek.astro';
 import SolveView from '../../components/notes/SolveView.astro';
+import VideoView from '../../components/notes/VideoView.astro';
 import { catalog } from '../../data/catalog';
 import '../../styles/notes.css';
 
@@ -84,6 +85,7 @@ const opensSection = (i: number) => i > 0 && statements[i].n.split('.')[0] !== s
 
   <StatementPeek />
   <SolveView />
+  <VideoView />
 
   <Colophon />
 </Base>

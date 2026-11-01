@@ -9,7 +9,8 @@
 //   1. 2. 3.       an ordered list, numbered (i), (ii), (iii)
 //   \{ \}          braces, escaped because MDX reads { } as code
 //   <Video id="…" title="…" duration="48:12" />
-//                  opens a section that follows a video; links out to YouTube, never embeds
+//                  opens a section that follows a video; plays it in a full-screen view on the page,
+//                  with a link to YouTube
 //   <Questions>    closes such a section: <Question> items, without solutions
 //   <Question answer-ctx="…">
 //                  one question; answer-ctx, required and never shown, is the expected answer and

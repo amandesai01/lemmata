@@ -221,8 +221,9 @@ The heading names what the section is about: `## Cosets and Lagrange’s theorem
 
 ### 5.2 The video card
 
-The `<Video>` card always comes first, directly under the heading. It links out to YouTube. Never
-embed a player or an iframe.
+The `<Video>` card always comes first, directly under the heading. Chosen, it plays the video in a
+full-screen view on the page, with a link to open it on YouTube. Write only the card: never add a
+player or an iframe to the note yourself.
 
 - `id`: the video's id, the `v=` of its watch URL.
 - `title`: what the video is about. Start from the video's own title and remove every channel,

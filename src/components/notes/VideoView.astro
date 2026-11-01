@@ -1,0 +1,226 @@
+---
+// Watching a section's video on the page. Choosing a <Video> card opens a plain page over the notes
+// with the video playing in YouTube's privacy-enhanced player, and a link to open it on YouTube
+// instead. The player is made when the view opens and removed when it closes, so nothing loads from
+// YouTube before a video is chosen and nothing plays after it is closed.
+---
+
+<dialog class="watch" aria-labelledby="watch-heading" autofocus>
+  <div class="watch-frame">
+    <header class="watch-top">
+      <h2 id="watch-heading" class="watch-where">
+        <span class="watch-label">Video</span>
+        <span class="watch-section"><span class="watch-section-n" data-watch-section-n></span><span data-watch-title></span></span>
+      </h2>
+      <p class="watch-actions">
+        <a class="watch-label watch-out" href="#" target="_blank" rel="noopener noreferrer" data-watch-out>
+          <span class="cap-text">Open on YouTube</span>
+          <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 2H10v5.5M10 2 2.5 9.5" /></svg>
+          <span class="visually-hidden">, in a new tab</span>
+        </a>
+        <button type="button" class="watch-label watch-close" data-watch-close>Close</button>
+      </p>
+    </header>
+
+    <div class="watch-stage">
+      <div class="watch-player" data-watch-player></div>
+    </div>
+  </div>
+</dialog>
+
+<script>
+  const watch = document.querySelector<HTMLDialogElement>('dialog.watch')!;
+  const sectionN = watch.querySelector<HTMLElement>('[data-watch-section-n]')!;
+  const heading = watch.querySelector<HTMLElement>('[data-watch-title]')!;
+  const out = watch.querySelector<HTMLAnchorElement>('[data-watch-out]')!;
+  const player = watch.querySelector<HTMLElement>('[data-watch-player]')!;
+
+  document.addEventListener('click', (e) => {
+    // A modified or middle click keeps the link's own meaning: open the video on YouTube.
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    const card = (e.target as Element).closest<HTMLAnchorElement>('a[data-video]');
+    if (!card) return;
+    e.preventDefault();
+    open(card);
+  });
+
+  function open(card: HTMLAnchorElement) {
+    const id = card.dataset.video!;
+
+    // The section is the nearest heading before the card; its numeral is its place among the headings.
+    let h = card.previousElementSibling;
+    while (h && h.tagName !== 'H2') h = h.previousElementSibling;
+    const headings = [...(card.parentElement?.querySelectorAll(':scope > h2') ?? [])];
+    sectionN.textContent = h ? String(headings.indexOf(h) + 1) : '';
+    heading.textContent = card.dataset.videoTitle ?? '';
+    out.href = card.href;
+
+    const frame = document.createElement('iframe');
+    frame.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?autoplay=1&rel=0&playsinline=1`;
+    frame.title = card.dataset.videoTitle ?? 'Video';
+    frame.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+    frame.allowFullscreen = true;
+    frame.referrerPolicy = 'strict-origin-when-cross-origin';
+    player.replaceChildren(frame);
+
+    watch.showModal();
+  }
+
+  watch.querySelector('[data-watch-close]')!.addEventListener('click', () => watch.close());
+  // Closing, by the control or by Escape, takes the player away so the video stops.
+  watch.addEventListener('close', () => player.replaceChildren());
+</script>
+
+<style>
+  /* A plain page laid over the notes, flat like every page, as the solving view is. */
+  .watch {
+    width: 100vw;
+    height: 100dvh;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: var(--paper);
+    color: var(--ink);
+    overflow: hidden;
+  }
+
+  .watch::backdrop { background: var(--paper); }
+  .watch:focus { outline: none; }
+
+  :global(html:has(dialog.watch[open])) { overflow: hidden; }
+
+  /* Opening, the page comes first, then where you are, then the player inks in. */
+  @media (prefers-reduced-motion: no-preference) {
+    .watch {
+      opacity: 0;
+      transition:
+        opacity 160ms cubic-bezier(0.4, 0, 1, 1),
+        overlay 160ms allow-discrete,
+        display 160ms allow-discrete;
+    }
+
+    .watch[open] {
+      opacity: 1;
+      transition-duration: 320ms;
+      transition-timing-function: var(--ease-out);
+    }
+
+    .watch[open] :is(.watch-top, .watch-stage) { transition: opacity 520ms var(--ease-out); }
+    .watch[open] .watch-top { transition-delay: 80ms; }
+    .watch[open] .watch-stage { transition-delay: 180ms; }
+
+    @starting-style {
+      .watch[open],
+      .watch[open] :is(.watch-top, .watch-stage) { opacity: 0; }
+    }
+  }
+
+  .watch-frame {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: clamp(1rem, 3vh, 2rem);
+    height: 100%;
+    max-width: 100rem;
+    margin: 0 auto;
+    padding: clamp(1rem, 3.5vh, 2rem) var(--gutter);
+  }
+
+  .watch-top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem 1.5rem;
+  }
+
+  .watch-where {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.35rem 1.25rem;
+    min-width: 0;
+    font-weight: 400;
+    font-size: 1rem;
+    line-height: 1.4;
+    color: var(--ink-2);
+  }
+
+  /* The section's numeral hangs, so a long title wraps beside it rather than under it. */
+  .watch-section { display: flex; }
+
+  .watch-section-n {
+    flex: none;
+    min-width: 1.5em;
+    color: var(--red);
+    font-variant-numeric: lining-nums;
+  }
+
+  .watch-section-n:empty { display: none; }
+
+  .watch-actions {
+    display: flex;
+    flex: none;
+    align-items: baseline;
+    gap: 1.75rem;
+  }
+
+  /* Labels and the controls set as labels. OPEN ON YOUTUBE is a link, so it takes ultramarine. */
+  .watch-label {
+    padding: 0;
+    border: 0;
+    background: none;
+    font-family: var(--face-text);
+    font-size: 0.8125rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  .watch-close { padding-block: 0.5rem; cursor: pointer; }
+  .watch-close:hover { color: var(--red); }
+
+  .watch-out {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-block: 0.5rem;
+    color: var(--blue);
+    text-decoration: none;
+  }
+
+  .watch-out svg {
+    width: 0.625rem;
+    height: 0.625rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+  }
+
+  .watch-out:hover { color: var(--red); }
+
+  /* The player keeps to 16:9 at the largest size the window allows, centred in the space left. */
+  .watch-stage {
+    display: grid;
+    place-items: center;
+    min-height: 0;
+    container-type: size;
+  }
+
+  .watch-player {
+    width: min(100cqw, 100cqh * 16 / 9);
+    aspect-ratio: 16 / 9;
+  }
+
+  .watch-player :global(iframe) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  @media (max-width: 599px) {
+    .watch-top { flex-direction: column; }
+    .watch-actions { align-self: stretch; justify-content: space-between; }
+  }
+</style>
