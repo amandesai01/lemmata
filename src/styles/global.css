@@ -1,0 +1,88 @@
+/* Byrne's four inks on a white page. Yellow is a field colour only: it never carries text. */
+:root {
+  color-scheme: light;
+
+  --paper: #FCFCFA;
+  --ink: #141414;
+  --ink-2: #4A4A47;   /* reading text */
+  --ink-3: #6B6B67;   /* secondary text, margin numerals */
+
+  --red: #D2321E;
+  --yellow: #EDB21B;
+  --blue: #1C3F94;
+
+  --face-text: "Libre Caslon Text", "Iowan Old Style", Georgia, serif;
+  --face-display: "Libre Caslon Display", "Libre Caslon Text", Georgia, serif;
+  /* Caslon has no mathematical symbols; STIX supplies them glyph by glyph. */
+  --face-math: "Libre Caslon Text", "STIX Two Text", "Cambria Math", "Iowan Old Style", Georgia, serif;
+
+  --gutter: clamp(1rem, 4.4vw, 4rem);
+  --margin-col: 4rem;   /* every numeral hangs in this column */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  background: var(--paper);
+  color: var(--ink);
+  -webkit-text-size-adjust: 100%;
+  scrollbar-color: var(--ink-3) var(--paper);
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+body {
+  margin: 0;
+  font-family: var(--face-text);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  caret-color: var(--red);
+  /* Pages fill the window, so a short page's footer rests at the bottom instead of mid-screen. */
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+}
+
+/* Full width, so the 100rem frames' auto margins centre them rather than shrinking them to fit. */
+body > * { width: 100%; }
+body > main { flex-grow: 1; }
+
+h1, h2, h3, h4, p, ol, figure { margin: 0; }
+ol { padding: 0; list-style: none; }
+
+::selection { background: var(--yellow); color: var(--ink); }
+
+a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.22em;
+}
+
+:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+}
+
+/* Moving between pages. The browser's own cross-document transition: the outgoing page lifts off
+   faster than the incoming one inks in, and the parts named below (the name, a subject's title)
+   travel to their place on the next page instead of blinking. */
+@view-transition { navigation: auto; }
+
+::view-transition-old(root) { animation: 160ms var(--ease-out) both vt-out; }
+::view-transition-new(root) { animation: 320ms var(--ease-out) both vt-in; }
+
+::view-transition-group(*) { animation-duration: 420ms; animation-timing-function: var(--ease-out); }
+
+@keyframes vt-out { to { opacity: 0; } }
+@keyframes vt-in { from { opacity: 0; } }
+
+/* Shared parts carry a name only when movement is welcome; otherwise the whole page crossfades. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-vt] { view-transition-name: var(--vt); }
+}

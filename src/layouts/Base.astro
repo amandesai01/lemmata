@@ -1,0 +1,35 @@
+---
+import '@fontsource/libre-caslon-text/400.css';
+import '@fontsource/libre-caslon-text/400-italic.css';
+import '@fontsource/libre-caslon-display/400.css';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#FCFCFA" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <script is:inline>
+      // A page reached through a view transition has already been introduced by it,
+      // so its own load entrance stands down.
+      addEventListener('pagereveal', (e) => {
+        if (e.viewTransition) document.documentElement.classList.add('arrived');
+      });
+    </script>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
