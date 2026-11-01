@@ -1,0 +1,7 @@
+---
+import Statement from './Statement.astro';
+
+type Props = { n: string; name?: string };
+---
+
+<Statement kind="Corollary" {...Astro.props}><slot /></Statement>

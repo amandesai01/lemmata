@@ -1,0 +1,146 @@
+/* The reading column of a subject's notes, as rendered from its MDX. Global rather than scoped,
+   because the markup comes from the note and its components, not from the page's own template. */
+
+.prose {
+  font-family: var(--face-math);
+  max-width: 38rem;
+  counter-reset: section;
+}
+
+/* Sections: each heading takes a vermilion numeral. */
+
+.prose h2 {
+  counter-increment: section;
+  scroll-margin-top: 2rem;
+  font-family: var(--face-text);
+  font-weight: 400;
+  font-size: clamp(1.625rem, 2.3vw, 2rem);
+  line-height: 1.2;
+  margin-bottom: 1.25rem;
+  text-wrap: balance;
+}
+
+.prose h2:not(:first-child) { margin-top: clamp(3.5rem, 7vw, 4.5rem); }
+
+.prose h2::before {
+  content: counter(section);
+  display: inline-block;
+  min-width: 1.5em;
+  color: var(--red);
+  font-variant-numeric: lining-nums;
+}
+
+.prose p,
+.prose ol { margin-top: 1rem; }
+.prose h2 + * { margin-top: 0; }
+
+.prose p { text-wrap: pretty; hanging-punctuation: first; }
+
+/* Variables (*G*) and defined terms (**group**) are both italic; subscripts and superscripts sit small. */
+.prose em,
+.prose var,
+.prose dfn { font-style: italic; }
+.prose sub,
+.prose sup { font-size: 0.72em; line-height: 0; }
+
+.prose a { text-decoration-color: var(--blue); }
+.prose a:hover { color: var(--blue); }
+
+/* Ordered lists inside the text are numbered (i), (ii), (iii) in the margin. */
+
+.prose ol {
+  counter-reset: item;
+  padding-left: 2.25rem;
+}
+
+.prose ol > li {
+  counter-increment: item;
+  position: relative;
+  margin-top: 0.4rem;
+}
+
+.prose ol > li::before {
+  content: '(' counter(item, lower-roman) ')';
+  position: absolute;
+  left: -2.25rem;
+  font-style: normal;
+  color: var(--ink-3);
+}
+
+/* Definitions, theorems and examples run in from a tracked head; statements of results are italic.
+   The first paragraph is set inline so it shares a line with the head. */
+
+.prose .env { margin-top: 1.5rem; }
+.prose .result { font-style: italic; }
+
+.env-head {
+  margin-right: 0.45em;
+  font-family: var(--face-text);
+  font-size: 0.8125rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-style: normal;
+  color: var(--ink);
+}
+
+.env-name { font-style: normal; }
+
+.env > .env-head ~ p:first-of-type,
+.proof > .proof-head + p { display: inline; }
+
+.prose .display {
+  margin-block: 1.25rem;
+  text-align: center;
+  font-size: 1.125rem;
+  font-style: normal;
+}
+
+.proof {
+  margin-top: 1rem;
+  color: var(--ink-2);
+}
+
+.proof-head {
+  margin-right: 0.35em;
+  font-style: italic;
+  color: var(--ink);
+}
+
+/* The end of a proof: a small square of ink set at the right of its last line. */
+.proof > p:last-child::after {
+  content: '';
+  float: right;
+  width: 0.5em;
+  height: 0.5em;
+  margin: 0.55em 0 0 1em;
+  background: var(--ink);
+}
+
+/* Problems are numbered by section, 8.1, 8.2, …, in the margin. */
+
+.problems ol {
+  counter-reset: problem;
+  padding-left: 0;
+}
+
+.problems ol > li {
+  counter-increment: problem;
+  padding-left: 2.75rem;
+  margin-top: 1rem;
+}
+
+.problems ol > li::before {
+  content: counter(section) '.' counter(problem);
+  left: 0;
+  font-size: 0.9375rem;
+  font-variant-numeric: lining-nums;
+}
+
+@media (min-width: 960px) {
+  /* Section numerals hang in the margin column, as the figure numeral does. */
+  .prose h2::before {
+    min-width: 0;
+    width: var(--margin-col);
+    margin-left: calc(-1 * var(--margin-col));
+  }
+}

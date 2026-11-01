@@ -1,0 +1,21 @@
+---
+// A definition, result or example. Its head runs into the first paragraph: THEOREM 3.3 (Lagrange).
+// Results are stated in italic; definitions and examples are set in roman.
+export type StatementKind = 'Definition' | 'Example' | 'Proposition' | 'Lemma' | 'Theorem' | 'Corollary';
+
+interface Props {
+  kind: StatementKind;
+  /** The number in the head, as written: "3.3". */
+  n: string;
+  /** An optional name, set in roman after the head: "Lagrange". */
+  name?: string;
+}
+
+const { kind, n, name } = Astro.props;
+const italic = kind !== 'Definition' && kind !== 'Example';
+---
+
+<div class:list={['env', { result: italic }]}>
+  <span class="env-head">{kind} {n}</span>{name && <span class="env-name">({name}).</span>}
+  <slot />
+</div>
