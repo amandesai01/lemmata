@@ -1,0 +1,263 @@
+---
+import Base from '../layouts/Base.astro';
+import Colophon from '../components/Colophon.astro';
+import SubjectFigure from '../components/SubjectFigure.astro';
+import { catalog } from '../data/catalog';
+---
+
+<Base title="Lemmata" description="Lemmata is an independent space for the study and exploration of mathematics.">
+  <main class="plate">
+    <div class="sheet">
+      <header class="intro">
+        <h1 class="wordmark" data-vt style="--vt: wordmark">Lemma<span class="plural">ta</span></h1>
+        <p class="pronunciation">
+          <span class="ipa">/ˈlem.ə.tə/</span>
+          <span class="respelling">LEM-uh-tuh</span>
+          <i class="part">noun, plural</i>
+        </p>
+        <p class="sense">The <span class="plural">plural</span> of <i>lemma</i>, the small results that proofs are built from.</p>
+        <p class="claim">An independent space for the study and exploration of mathematics.</p>
+        <p class="lede">
+          Mathematics beyond the curriculum, worked through and published as lecture notes,
+          references, further reading and problems.
+        </p>
+      </header>
+
+      <hr class="rule" />
+
+      <section class="contents" aria-labelledby="contents-heading">
+        <h2 id="contents-heading" class="contents-head">Contents</h2>
+
+        {catalog.map((section) => (
+          <section class="area" id={section.id} aria-labelledby={`${section.id}-heading`}>
+            <h3 id={`${section.id}-heading`} class="area-head">{section.name}</h3>
+            <ol class="results">
+              {section.entries.map((entry) => (
+                <li class="result">
+                  <SubjectFigure figure={entry.figure} size={24} />
+                  <h4 class="name"><a href={entry.href} data-vt style={`--vt: subject-${entry.href.split('/').filter(Boolean).pop()}`}>{entry.name}</a></h4>
+                  <p class="description">{entry.description}</p>
+                </li>
+              ))}
+            </ol>
+          </section>
+        ))}
+      </section>
+    </div>
+  </main>
+
+  <Colophon />
+</Base>
+
+<style>
+  /* One compact sheet at the left edge of the page frame. Vertically, the free space splits 2 : 3
+     above and below, lifting the sheet to the optical centre; on a short window both collapse instead of scrolling. */
+  .plate {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    max-width: 100rem;
+    margin-inline: auto;
+    padding: clamp(1.5rem, 5svh, 3rem) var(--gutter) 0;
+  }
+
+  .plate::before { content: ''; flex: 2; }
+  .plate::after { content: ''; flex: 3; }
+
+  .sheet {
+    --wordmark: clamp(2.25rem, 4.2vw, 3.5rem);
+    width: min(100%, 40rem);
+  }
+
+  .wordmark {
+    font-family: var(--face-display);
+    font-weight: 400;
+    font-size: var(--wordmark);
+    line-height: 0.9;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    /* Optical: pull the L's serif back to the column edge. */
+    margin-left: -0.04em;
+    /* Shrink-wrapped, so the name travels to the masthead as the word itself. */
+    width: fit-content;
+  }
+
+  /* Colour as reference, as Byrne names a figure's part by its ink: the headword's plural ending and the
+     word "plural" in its sense share Vermilion, while lemma stays black in both. */
+  .plural { color: var(--red); }
+
+  /* The name read as a dictionary entry: pronunciation, then the one sense, held tight under the headword. */
+  .pronunciation {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 0.875em;
+    margin-top: 0.875rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+
+  .pronunciation > * { white-space: nowrap; }
+
+  /* Caslon lacks the stress mark; STIX fills it in. */
+  .ipa { font-family: var(--face-math); }
+
+  .respelling { letter-spacing: 0.02em; }
+
+  .part { color: var(--ink-3); }
+
+  .sense {
+    margin-top: 0.125rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    max-width: 36em;
+    text-wrap: pretty;
+  }
+
+  /* The defining line is the page's statement: set at headline size in the Text cut (sturdier than
+     Display at this size), with room above it so it reads as its own block, not the entry's tail. */
+  .claim {
+    margin-top: clamp(1.75rem, 4.5svh, 2.75rem);
+    font-size: clamp(1.5rem, 2.3vw, 2rem);
+    line-height: 1.2;
+    letter-spacing: -0.005em;
+    max-width: 17em;
+    text-wrap: balance;
+  }
+
+  .lede {
+    margin-top: 0.875rem;
+    font-size: 1rem;
+    line-height: 1.55;
+    color: var(--ink-2);
+    max-width: 36em;
+    text-wrap: pretty;
+  }
+
+  /* The one rule in the system: it separates the introduction from the contents. */
+  .rule {
+    margin: clamp(2rem, 5svh, 3rem) 0 clamp(1.5rem, 4svh, 2.25rem);
+    border: 0;
+    border-top: 1px solid var(--ink);
+  }
+
+  .contents-head {
+    font-weight: 400;
+    font-size: 1.5rem;
+    line-height: 1.2;
+  }
+
+  .area {
+    margin-top: 1.125rem;
+    scroll-margin-top: 1.5rem;
+  }
+
+  .area + .area { margin-top: 1.75rem; }
+
+  .area-head {
+    margin-bottom: 0.75rem;
+    font-weight: 400;
+    font-size: 0.8125rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  /* Subjects read like search results: a linked title, the description beneath, no box. */
+  .results {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .result {
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr);
+    column-gap: 0.75rem;
+    align-items: start;
+  }
+
+  /* The figure turns a third of a turn while its link is pointed at: the triangle lands on itself, the axes trade places. */
+  .result :global(.subject-figure) {
+    grid-row: 1 / span 2;
+    margin-top: 0.1875rem;
+    transform-origin: 50% 63.54%;
+    transition: transform 820ms var(--ease-out);
+  }
+
+  .result:has(.name a:hover, .name a:focus-visible) :global(.subject-figure) {
+    transform: rotate(120deg);
+  }
+
+  .name {
+    font-weight: 400;
+    font-size: 1.125rem;
+    line-height: 1.3;
+  }
+
+  .name a {
+    color: var(--blue);
+    text-decoration: none;
+  }
+
+  .name a:hover {
+    color: var(--red);
+    text-decoration: underline;
+    text-decoration-color: var(--red);
+  }
+
+  .description {
+    grid-column: 2;
+    margin-top: 0.125rem;
+    max-width: 36em;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--ink-2);
+    text-wrap: pretty;
+  }
+
+  /* Facing pages from 960px: the entry on the left, the contents on the right, and the rule stood upright
+     between them as the spine. Both pages start on the wordmark's cap line (0.11em into its line box;
+     the Contents heading's capitals sit 0.185em into its own). */
+  @media (min-width: 960px) {
+    .sheet {
+      display: grid;
+      /* Each page is capped at the intro's measure, so on very wide windows the spread stays one
+         object on the frame's left edge instead of its pages drifting apart. */
+      grid-template-columns: minmax(0, 36rem) auto minmax(0, 36rem);
+      justify-content: start;
+      column-gap: clamp(2.5rem, 4.4vw, 4rem);
+      align-items: start;
+      width: 100%;
+    }
+
+    .rule {
+      align-self: stretch;
+      margin: calc(0.11 * var(--wordmark)) 0 0;
+      border-top: 0;
+      border-left: 1px solid var(--ink);
+    }
+
+    .contents { margin-top: calc(0.11 * var(--wordmark) - 0.185 * 1.5rem); }
+  }
+
+  /* First load: the sheet inks in. The intro first, then the rule is drawn down the spine
+     (across the sheet on phones), then the contents. Nothing changes place; a page reached
+     through a view transition skips this. */
+  :global(html:not(.arrived)) .intro { animation: ink-in 520ms var(--ease-out) both; }
+  :global(html:not(.arrived)) .rule { animation: rule-across 700ms 120ms var(--ease-out) both; transform-origin: left; }
+  :global(html:not(.arrived)) .contents { animation: ink-in 520ms 280ms var(--ease-out) both; }
+
+  @keyframes ink-in { from { opacity: 0; } }
+  @keyframes rule-across { from { transform: scaleX(0); } }
+  @keyframes rule-down { from { transform: scaleY(0); } }
+
+  @media (min-width: 960px) {
+    :global(html:not(.arrived)) .rule { animation-name: rule-down; transform-origin: top; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html:not(.arrived)) .rule { animation: ink-in 520ms 120ms var(--ease-out) both; }
+    .result :global(.subject-figure) { transition: none; }
+    .result:has(.name a:hover, .name a:focus-visible) :global(.subject-figure) { transform: none; }
+  }
+</style>
