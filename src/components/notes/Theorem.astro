@@ -1,7 +1,7 @@
 ---
 import Statement from './Statement.astro';
 
-type Props = { n: string; name?: string };
+type Props = { n: string; name?: string; title: string };
 ---
 
 <Statement kind="Theorem" {...Astro.props}><slot /></Statement>

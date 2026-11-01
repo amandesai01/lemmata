@@ -1,6 +1,9 @@
 // The components available in every note's MDX, without importing them.
 //
 // Conventions for writing notes:
+//   <Theorem n="3.3" name="Lagrange" title="Lagrange’s theorem">
+//                  every Definition, Example, Proposition, Lemma, Theorem and Corollary needs a
+//                  title; it is listed under the statement's label in the statements rail
 //   *G*            a variable, set in italic
 //   **group**      a term being defined, set as <dfn> (the notes never use bold)
 //   1. 2. 3.       an ordered list, numbered (i), (ii), (iii)

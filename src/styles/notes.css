@@ -73,14 +73,31 @@
 .prose .env { margin-top: 1.5rem; }
 .prose .result { font-style: italic; }
 
+/* The head is the one place the notes use a heavier weight: in vermilion semibold, so each
+   definition, result and example can be found down the page at a glance. */
 .env-head {
   margin-right: 0.45em;
   font-family: var(--face-text);
   font-size: 0.8125rem;
-  letter-spacing: 0.14em;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   font-style: normal;
-  color: var(--ink);
+  color: var(--red);
+}
+
+.prose .env { scroll-margin-top: 2rem; }
+
+/* As a link to its statement, the head stays vermilion and takes a vermilion underline on hover. */
+.prose a.env-head {
+  color: var(--red);
+  text-decoration: none;
+}
+
+.prose a.env-head:hover {
+  color: var(--red);
+  text-decoration-line: underline;
+  text-decoration-color: var(--red);
 }
 
 .env-name { font-style: normal; }

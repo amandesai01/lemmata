@@ -1,7 +1,7 @@
 ---
 // A definition, result or example. Its head runs into the first paragraph: THEOREM 3.3 (Lagrange).
 // Results are stated in italic; definitions and examples are set in roman.
-export type StatementKind = 'Definition' | 'Example' | 'Proposition' | 'Lemma' | 'Theorem' | 'Corollary';
+import { statementId, type StatementKind } from './statements';
 
 interface Props {
   kind: StatementKind;
@@ -9,13 +9,18 @@ interface Props {
   n: string;
   /** An optional name, set in roman after the head: "Lagrange". */
   name?: string;
+  /** Required. What the statement is, shown under its label in the statements rail: "Lagrange’s theorem".
+      May use *variables* and <sub>/<sup>. Not set on the page itself. */
+  title: string;
 }
 
 const { kind, n, name } = Astro.props;
 const italic = kind !== 'Definition' && kind !== 'Example';
+const id = statementId(kind, n);
 ---
 
-<div class:list={['env', { result: italic }]}>
-  <span class="env-head">{kind} {n}</span>{name && <span class="env-name">({name}).</span>}
+<!-- The head links to the statement itself, as a contents entry links to its section. -->
+<div id={id} class:list={['env', { result: italic }]}>
+  <a class="env-head" href={`#${id}`}>{kind} {n}</a>{name && <span class="env-name">({name}).</span>}
   <slot />
 </div>
