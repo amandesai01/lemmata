@@ -1,0 +1,629 @@
+---
+import Base from '../../layouts/Base.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import Colophon from '../../components/Colophon.astro';
+import SymmetryFigure from '../../components/SymmetryFigure.astro';
+
+const sections = [
+  { id: 'groups', title: 'Groups' },
+  { id: 'subgroups', title: 'Subgroups' },
+  { id: 'cosets', title: 'Cosets and Lagrange’s theorem' },
+  { id: 'quotients', title: 'Normal subgroups and quotients' },
+  { id: 'homomorphisms', title: 'Homomorphisms' },
+  { id: 'actions', title: 'Group actions' },
+  { id: 'sylow', title: 'The Sylow theorems' },
+  { id: 'problems', title: 'Problems' },
+];
+
+const n = (id: string) => sections.findIndex((s) => s.id === id) + 1;
+---
+
+<Base
+  title="Abstract Group Theory · Lemmata"
+  description="Lecture notes on abstract group theory, from the axioms to the Sylow theorems."
+>
+  <SiteHeader />
+
+  <main class="notes">
+    <div class="opening-figure">
+      <SymmetryFigure />
+    </div>
+
+    <header class="title-block">
+      <h1 data-vt style="--vt: subject-abstract-group-theory">Abstract Group Theory</h1>
+      <dl class="facts">
+        <dt>Area</dt>
+        <dd><a href="/#abstract-algebra">Abstract Algebra</a></dd>
+      </dl>
+      <p class="abstract">
+        Groups from the axioms: subgroups and cosets, Lagrange’s theorem, normal subgroups and quotients,
+        homomorphisms, group actions and the Sylow theorems, with problems at the end.
+      </p>
+    </header>
+
+    <nav class="contents" aria-labelledby="contents-heading">
+      <h2 id="contents-heading">Contents</h2>
+      <ol>
+        {sections.map((s, i) => (
+          <li>
+            <a href={`#${s.id}`} data-section={s.id}>
+              <span class="toc-num">{i + 1}</span>
+              <span>{s.title}</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </nav>
+
+    <article class="prose">
+      <section id="groups" aria-labelledby="groups-h">
+        <h2 id="groups-h"><span class="num">{n('groups')}</span>Groups</h2>
+        <p>
+          A group is the algebraic record of symmetry. Whenever a collection of transformations can be composed,
+          undone, and contains the transformation that does nothing, the collection is a group, and its
+          properties can be studied without reference to what is being transformed.
+        </p>
+        <p class="env">
+          <span class="env-head">Definition 1.1</span> A <dfn>group</dfn> is a set <var>G</var> with a binary
+          operation (<var>g</var>, <var>h</var>) ↦ <var>gh</var> satisfying three axioms:
+        </p>
+        <ol class="axioms">
+          <li><em>associativity:</em> (<var>gh</var>)<var>k</var> = <var>g</var>(<var>hk</var>) for all <var>g</var>, <var>h</var>, <var>k</var> ∈ <var>G</var>;</li>
+          <li><em>identity:</em> there is <var>e</var> ∈ <var>G</var> with <var>eg</var> = <var>ge</var> = <var>g</var> for all <var>g</var> ∈ <var>G</var>;</li>
+          <li><em>inverses:</em> each <var>g</var> ∈ <var>G</var> has some <var>g</var><sup>−1</sup> ∈ <var>G</var> with <var>gg</var><sup>−1</sup> = <var>g</var><sup>−1</sup><var>g</var> = <var>e</var>.</li>
+        </ol>
+        <p>
+          If in addition <var>gh</var> = <var>hg</var> for all <var>g</var>, <var>h</var> ∈ <var>G</var>, the group is
+          <dfn>abelian</dfn>. The number of elements of <var>G</var> is its <dfn>order</dfn>, written |<var>G</var>|.
+        </p>
+        <p class="env">
+          <span class="env-head">Example 1.2</span> The integers ℤ under addition; the residues ℤ/<var>n</var>ℤ
+          under addition modulo <var>n</var>; the non-zero rationals under multiplication; the symmetric group
+          <var>S</var><sub><var>n</var></sub> of all permutations of &lbrace;1, …, <var>n</var>&rbrace; under composition, of order
+          <var>n</var>!; and the invertible <var>n</var> × <var>n</var> real matrices GL<sub><var>n</var></sub>(ℝ)
+          under matrix multiplication.
+        </p>
+        <p class="env">
+          <span class="env-head">Example 1.3</span> The six symmetries of the triangle in <a href="#fig-1-caption">Fig. 1</a>
+          form a group <var>D</var><sub>3</sub>, the operation being “one after the other”. It is not abelian:
+          reflecting in the red axis and then the blue does not give the same result as the blue and then the red.
+        </p>
+        <p class="env">
+          <span class="env-head">Proposition 1.4</span>
+          <span class="stmt">The identity of a group is unique, and each element has exactly one inverse.</span>
+        </p>
+        <div class="proof">
+          <p>
+            <span class="proof-head">Proof.</span> If <var>e</var> and <var>e</var>′ are both identities then
+            <var>e</var> = <var>ee</var>′ = <var>e</var>′. If <var>h</var> and <var>h</var>′ are both inverses of
+            <var>g</var>, then <var>h</var> = <var>he</var> = <var>h</var>(<var>gh</var>′) = (<var>hg</var>)<var>h</var>′
+            = <var>eh</var>′ = <var>h</var>′.
+          </p>
+        </div>
+      </section>
+
+      <section id="subgroups" aria-labelledby="subgroups-h">
+        <h2 id="subgroups-h"><span class="num">{n('subgroups')}</span>Subgroups</h2>
+        <p class="env">
+          <span class="env-head">Definition 2.1</span> A subset <var>H</var> of a group <var>G</var> is a
+          <dfn>subgroup</dfn>, written <var>H</var> ≤ <var>G</var>, if <var>H</var> is itself a group under the
+          operation of <var>G</var>.
+        </p>
+        <p class="env">
+          <span class="env-head">Proposition 2.2</span> (Subgroup test).
+          <span class="stmt">A non-empty subset <var>H</var> of <var>G</var> is a subgroup if and only if
+          <var>gh</var><sup>−1</sup> ∈ <var>H</var> for all <var>g</var>, <var>h</var> ∈ <var>H</var>.</span>
+        </p>
+        <div class="proof">
+          <p>
+            <span class="proof-head">Proof.</span> A subgroup clearly has this property. Conversely, choose
+            <var>h</var> ∈ <var>H</var>. Taking <var>g</var> = <var>h</var> gives <var>e</var> ∈ <var>H</var>;
+            taking <var>g</var> = <var>e</var> gives <var>h</var><sup>−1</sup> ∈ <var>H</var>; and then
+            <var>g</var>(<var>h</var><sup>−1</sup>)<sup>−1</sup> = <var>gh</var> ∈ <var>H</var>, so <var>H</var> is
+            closed. Associativity is inherited from <var>G</var>.
+          </p>
+        </div>
+        <p class="env">
+          <span class="env-head">Definition 2.3</span> The <dfn>order</dfn> of an element <var>g</var> is the least
+          <var>n</var> ≥ 1 with <var>g</var><sup><var>n</var></sup> = <var>e</var>, if there is one. The
+          <dfn>cyclic subgroup</dfn> generated by <var>g</var> is ⟨<var>g</var>⟩ = &lbrace;<var>g</var><sup><var>k</var></sup> : <var>k</var> ∈ ℤ&rbrace;,
+          and its order is the order of <var>g</var>.
+        </p>
+        <p>
+          The subgroups of <var>D</var><sub>3</sub> are the trivial subgroup, three subgroups of order 2 (each
+          reflection together with the identity), the subgroup of order 3 formed by the rotations, and
+          <var>D</var><sub>3</sub> itself. No subgroup has order 4 or 5, and the next section explains why none could.
+        </p>
+      </section>
+
+      <section id="cosets" aria-labelledby="cosets-h">
+        <h2 id="cosets-h"><span class="num">{n('cosets')}</span>Cosets and Lagrange’s theorem</h2>
+        <p class="env">
+          <span class="env-head">Definition 3.1</span> For <var>H</var> ≤ <var>G</var> and <var>g</var> ∈ <var>G</var>,
+          the <dfn>left coset</dfn> of <var>H</var> containing <var>g</var> is <var>gH</var> = &lbrace;<var>gh</var> : <var>h</var> ∈ <var>H</var>&rbrace;.
+          The number of left cosets is the <dfn>index</dfn> of <var>H</var> in <var>G</var>, written [<var>G</var> : <var>H</var>].
+        </p>
+        <p class="env">
+          <span class="env-head">Lemma 3.2</span>
+          <span class="stmt">The left cosets of <var>H</var> partition <var>G</var>, and each has exactly |<var>H</var>| elements.</span>
+        </p>
+        <div class="proof">
+          <p>
+            <span class="proof-head">Proof.</span> Every <var>g</var> lies in <var>gH</var>, so the cosets cover
+            <var>G</var>. If <var>gH</var> and <var>g</var>′<var>H</var> share an element, say <var>gh</var> =
+            <var>g</var>′<var>h</var>′, then <var>g</var> = <var>g</var>′<var>h</var>′<var>h</var><sup>−1</sup> ∈
+            <var>g</var>′<var>H</var>, so <var>gH</var> ⊆ <var>g</var>′<var>H</var>; by symmetry the two cosets are
+            equal. Finally <var>h</var> ↦ <var>gh</var> is a bijection from <var>H</var> to <var>gH</var>, with
+            inverse <var>x</var> ↦ <var>g</var><sup>−1</sup><var>x</var>.
+          </p>
+        </div>
+        <p class="env">
+          <span class="env-head">Theorem 3.3</span> (Lagrange).
+          <span class="stmt">If <var>G</var> is finite and <var>H</var> ≤ <var>G</var>, then</span>
+        </p>
+        <p class="display">|<var>G</var>| = [<var>G</var> : <var>H</var>] · |<var>H</var>|.</p>
+        <p class="stmt-cont">In particular the order of a subgroup divides the order of the group.</p>
+        <div class="proof">
+          <p><span class="proof-head">Proof.</span> By Lemma 3.2, <var>G</var> is the disjoint union of [<var>G</var> : <var>H</var>] cosets, each of size |<var>H</var>|.</p>
+        </div>
+        <p class="env">
+          <span class="env-head">Corollary 3.4</span>
+          <span class="stmt">In a finite group the order of every element divides the order of the group. A group of
+          prime order is cyclic, generated by any element other than the identity.</span>
+        </p>
+        <p>
+          The converse of Lagrange’s theorem fails: a group need not have a subgroup of every order dividing its
+          own. The alternating group <var>A</var><sub>4</sub>, of order 12, has no subgroup of order 6
+          (Problem 8.6).
+        </p>
+      </section>
+
+      <section id="quotients" aria-labelledby="quotients-h">
+        <h2 id="quotients-h"><span class="num">{n('quotients')}</span>Normal subgroups and quotients</h2>
+        <p class="env">
+          <span class="env-head">Definition 4.1</span> A subgroup <var>N</var> ≤ <var>G</var> is
+          <dfn>normal</dfn>, written <var>N</var> ⊴ <var>G</var>, if <var>gNg</var><sup>−1</sup> = <var>N</var> for
+          every <var>g</var> ∈ <var>G</var>; equivalently, if every left coset <var>gN</var> equals the right coset
+          <var>Ng</var>.
+        </p>
+        <p>
+          When <var>N</var> is normal, the cosets of <var>N</var> form a group <var>G</var>/<var>N</var>, the
+          <dfn>quotient</dfn> of <var>G</var> by <var>N</var>, under the operation
+        </p>
+        <p class="display">(<var>gN</var>)(<var>hN</var>) = <var>ghN</var>.</p>
+        <p>
+          Normality is exactly what makes this well defined: the product must not depend on which elements are
+          chosen to name the two cosets.
+        </p>
+        <p class="env">
+          <span class="env-head">Proposition 4.2</span>
+          <span class="stmt">Every subgroup of index 2 is normal.</span>
+        </p>
+        <div class="proof">
+          <p>
+            <span class="proof-head">Proof.</span> If [<var>G</var> : <var>H</var>] = 2, the two left cosets are
+            <var>H</var> and its complement <var>G</var> ∖ <var>H</var>, and so are the two right cosets. Hence
+            <var>gH</var> = <var>Hg</var> for every <var>g</var>.
+          </p>
+        </div>
+        <p class="env">
+          <span class="env-head">Example 4.3</span> The rotations form a subgroup of index 2 in
+          <var>D</var><sub>3</sub>, so they are normal, and the quotient has order 2: it records only whether a
+          symmetry turns the triangle over. The subgroup formed by the identity and the reflection in the red axis
+          is not normal, since conjugating that reflection by a rotation gives a reflection in another axis.
+        </p>
+      </section>
+
+      <section id="homomorphisms" aria-labelledby="homomorphisms-h">
+        <h2 id="homomorphisms-h"><span class="num">{n('homomorphisms')}</span>Homomorphisms</h2>
+        <p class="env">
+          <span class="env-head">Definition 5.1</span> A <dfn>homomorphism</dfn> is a map
+          φ : <var>G</var> → <var>K</var> between groups with φ(<var>gh</var>) = φ(<var>g</var>)φ(<var>h</var>) for
+          all <var>g</var>, <var>h</var> ∈ <var>G</var>. Its <dfn>kernel</dfn> is
+          ker φ = &lbrace;<var>g</var> ∈ <var>G</var> : φ(<var>g</var>) = <var>e</var>&rbrace; and its <dfn>image</dfn> is
+          im φ = &lbrace;φ(<var>g</var>) : <var>g</var> ∈ <var>G</var>&rbrace;. A bijective homomorphism is an
+          <dfn>isomorphism</dfn>, written <var>G</var> ≅ <var>K</var>.
+        </p>
+        <p class="env">
+          <span class="env-head">Proposition 5.2</span>
+          <span class="stmt">The kernel of a homomorphism is a normal subgroup of its domain, and φ is injective if
+          and only if its kernel is trivial.</span>
+        </p>
+        <div class="proof">
+          <p>
+            <span class="proof-head">Proof.</span> If <var>k</var> ∈ ker φ and <var>g</var> ∈ <var>G</var> then
+            φ(<var>gkg</var><sup>−1</sup>) = φ(<var>g</var>) <var>e</var> φ(<var>g</var>)<sup>−1</sup> = <var>e</var>,
+            so <var>gkg</var><sup>−1</sup> ∈ ker φ; the subgroup test does the rest. And φ(<var>g</var>) =
+            φ(<var>h</var>) exactly when <var>gh</var><sup>−1</sup> ∈ ker φ.
+          </p>
+        </div>
+        <p class="env">
+          <span class="env-head">Theorem 5.3</span> (First isomorphism theorem).
+          <span class="stmt">For any homomorphism φ : <var>G</var> → <var>K</var>, the map
+          <var>g</var> ker φ ↦ φ(<var>g</var>) is a well-defined isomorphism</span>
+        </p>
+        <p class="display"><var>G</var> / ker φ ≅ im φ.</p>
+        <p class="env">
+          <span class="env-head">Example 5.4</span> The sign of a permutation is a homomorphism
+          <var>S</var><sub><var>n</var></sub> → &lbrace;±1&rbrace;. For <var>n</var> ≥ 2 it is onto, and its kernel is the
+          alternating group <var>A</var><sub><var>n</var></sub> of even permutations, so
+          by Theorem 5.3 <var>S</var><sub><var>n</var></sub> / <var>A</var><sub><var>n</var></sub> ≅ &lbrace;±1&rbrace;.
+        </p>
+      </section>
+
+      <section id="actions" aria-labelledby="actions-h">
+        <h2 id="actions-h"><span class="num">{n('actions')}</span>Group actions</h2>
+        <p class="env">
+          <span class="env-head">Definition 6.1</span> An <dfn>action</dfn> of a group <var>G</var> on a set
+          <var>X</var> is a map <var>G</var> × <var>X</var> → <var>X</var>, written (<var>g</var>, <var>x</var>) ↦
+          <var>g</var> · <var>x</var>, such that <var>e</var> · <var>x</var> = <var>x</var> and
+          <var>g</var> · (<var>h</var> · <var>x</var>) = (<var>gh</var>) · <var>x</var> for all <var>g</var>,
+          <var>h</var> ∈ <var>G</var> and <var>x</var> ∈ <var>X</var>. The <dfn>orbit</dfn> of <var>x</var> is
+          <var>G</var> · <var>x</var> = &lbrace;<var>g</var> · <var>x</var> : <var>g</var> ∈ <var>G</var>&rbrace;, and its
+          <dfn>stabiliser</dfn> is <var>G</var><sub><var>x</var></sub> = &lbrace;<var>g</var> ∈ <var>G</var> :
+          <var>g</var> · <var>x</var> = <var>x</var>&rbrace;.
+        </p>
+        <p class="env">
+          <span class="env-head">Theorem 6.2</span> (Orbit–stabiliser).
+          <span class="stmt">If a finite group <var>G</var> acts on <var>X</var>, then for every <var>x</var> ∈ <var>X</var></span>
+        </p>
+        <p class="display">|<var>G</var> · <var>x</var>| · |<var>G</var><sub><var>x</var></sub>| = |<var>G</var>|.</p>
+        <div class="proof">
+          <p>
+            <span class="proof-head">Proof.</span> The stabiliser is a subgroup, and <var>g</var> · <var>x</var> =
+            <var>h</var> · <var>x</var> exactly when <var>g</var><sup>−1</sup><var>h</var> ∈
+            <var>G</var><sub><var>x</var></sub>, that is, when <var>gG</var><sub><var>x</var></sub> =
+            <var>hG</var><sub><var>x</var></sub>. So points of the orbit correspond one to one with left cosets of
+            the stabiliser, and Lagrange’s theorem finishes the count.
+          </p>
+        </div>
+        <p class="env">
+          <span class="env-head">Example 6.3</span> <var>D</var><sub>3</sub> acts on the three corners of the
+          triangle in <a href="#fig-1-caption">Fig. 1</a>. The orbit of any corner is all three corners, and the
+          stabiliser of a corner has two elements: the identity, and the reflection in the axis through that corner.
+          Indeed 3 · 2 = 6.
+        </p>
+      </section>
+
+      <section id="sylow" aria-labelledby="sylow-h">
+        <h2 id="sylow-h"><span class="num">{n('sylow')}</span>The Sylow theorems</h2>
+        <p>
+          Lagrange’s theorem limits which subgroups can exist. Sylow’s theorems go the other way: for prime powers
+          they guarantee that subgroups exist, and they constrain how many there are.
+        </p>
+        <p class="env">
+          <span class="env-head">Theorem 7.1</span> (Sylow).
+          <span class="stmt">Let |<var>G</var>| = <var>p</var><sup><var>a</var></sup><var>m</var>, where
+          <var>p</var> is prime and does not divide <var>m</var>. Then</span>
+        </p>
+        <ol class="axioms stmt-list">
+          <li><var>G</var> has a subgroup of order <var>p</var><sup><var>a</var></sup>, called a <dfn>Sylow <var>p</var>-subgroup</dfn>;</li>
+          <li>any two Sylow <var>p</var>-subgroups are conjugate in <var>G</var>;</li>
+          <li>their number <var>n</var><sub><var>p</var></sub> satisfies <var>n</var><sub><var>p</var></sub> ≡ 1 (mod <var>p</var>) and <var>n</var><sub><var>p</var></sub> divides <var>m</var>.</li>
+        </ol>
+        <p class="env">
+          <span class="env-head">Example 7.2</span> Every group of order 15 is cyclic. Here
+          <var>n</var><sub>3</sub> divides 5 and is 1 modulo 3, so <var>n</var><sub>3</sub> = 1; and
+          <var>n</var><sub>5</sub> divides 3 and is 1 modulo 5, so <var>n</var><sub>5</sub> = 1. Each Sylow subgroup
+          is therefore normal, the two meet only in the identity, and <var>G</var> is their direct product
+          <var>C</var><sub>3</sub> × <var>C</var><sub>5</sub> ≅ <var>C</var><sub>15</sub>.
+        </p>
+      </section>
+
+      <section id="problems" aria-labelledby="problems-h">
+        <h2 id="problems-h"><span class="num">{n('problems')}</span>Problems</h2>
+        <ol class="problems" style={`--section: '${n('problems')}'`}>
+          <li>Show that a group in which <var>g</var><sup>2</sup> = <var>e</var> for every element <var>g</var> is abelian.</li>
+          <li>Prove that every group of order 4 is isomorphic either to <var>C</var><sub>4</sub> or to <var>C</var><sub>2</sub> × <var>C</var><sub>2</sub>.</li>
+          <li>Find every subgroup of ℤ/12ℤ, and draw the lattice they form under inclusion.</li>
+          <li>Let <var>G</var> be a finite group acting on a finite set <var>X</var>. Prove that the number of orbits equals the average, over <var>g</var> ∈ <var>G</var>, of the number of points fixed by <var>g</var>.</li>
+          <li>Prove that a group of order <var>p</var><sup>2</sup>, with <var>p</var> prime, is abelian.</li>
+          <li>Show that the alternating group <var>A</var><sub>4</sub> has no subgroup of order 6.</li>
+        </ol>
+      </section>
+    </article>
+  </main>
+
+  <Colophon />
+</Base>
+
+<script>
+  // Mark the section being read in the contents.
+  const links = new Map(
+    [...document.querySelectorAll<HTMLAnchorElement>('.contents a[data-section]')].map((a) => [a.dataset.section!, a]),
+  );
+  const sections = [...document.querySelectorAll<HTMLElement>('.prose > section')];
+
+  const mark = (id: string | null) => {
+    links.forEach((a, key) => {
+      if (key === id) a.setAttribute('aria-current', 'location');
+      else a.removeAttribute('aria-current');
+    });
+  };
+
+  if (sections.length && 'IntersectionObserver' in window) {
+    const visible = new Set<string>();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => (e.isIntersecting ? visible.add(e.target.id) : visible.delete(e.target.id)));
+        const first = sections.find((s) => visible.has(s.id));
+        if (first) mark(first.id);
+      },
+      // A section counts as being read while it crosses the upper third of the window.
+      { rootMargin: '-15% 0px -60% 0px' },
+    );
+    sections.forEach((s) => observer.observe(s));
+  }
+</script>
+
+<style>
+  .notes {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'figure' 'head' 'contents' 'body';
+    max-width: 100rem;
+    margin-inline: auto;
+    padding: clamp(1.5rem, 5vw, 2.5rem) var(--gutter) 0;
+  }
+
+  .opening-figure { grid-area: figure; }
+  .title-block { grid-area: head; margin-top: clamp(2.5rem, 7vw, 3.5rem); }
+  .contents { grid-area: contents; margin-top: 3rem; }
+  .prose { grid-area: body; margin-top: clamp(3rem, 7vw, 4rem); }
+
+  /* Title block */
+
+  h1 {
+    font-family: var(--face-display);
+    font-weight: 400;
+    font-size: clamp(2.75rem, 5vw, 4.75rem);
+    line-height: 1;
+    letter-spacing: -0.005em;
+    text-wrap: balance;
+    /* Shrink-wrapped, so the title arriving from the homepage lands on the words, not the full column. */
+    width: fit-content;
+  }
+
+  .facts {
+    display: grid;
+    grid-template-columns: calc(var(--margin-col) + 0.5rem) minmax(0, 1fr);
+    row-gap: 0.25rem;
+    margin: 1.75rem 0 0;
+    font-size: 1rem;
+  }
+
+  .facts dt {
+    padding-top: 0.2rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  .facts dd { margin: 0; color: var(--ink); }
+  .facts a { text-decoration-color: var(--ink-3); }
+  .facts a:hover { color: var(--red); text-decoration-color: var(--red); }
+
+  .abstract {
+    margin-top: 1.75rem;
+    max-width: 34em;
+    font-size: clamp(1.125rem, 1.4vw, 1.25rem);
+    line-height: 1.5;
+    text-wrap: pretty;
+  }
+
+  /* Contents */
+
+  .contents h2 {
+    font-weight: 400;
+    font-size: 0.8125rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+
+  .contents a {
+    display: grid;
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    padding-block: 0.3rem;
+    font-size: 1rem;
+    line-height: 1.35;
+    color: var(--ink-2);
+    text-decoration: none;
+  }
+
+  .toc-num {
+    font-variant-numeric: lining-nums tabular-nums;
+    color: var(--ink-3);
+  }
+
+  .contents a:hover { color: var(--red); }
+  .contents a:hover span:last-child { text-decoration: underline; text-decoration-color: var(--red); }
+
+  /* The section being read: full ink, its numeral in red. */
+  .contents a[aria-current='location'] { color: var(--ink); }
+  .contents a[aria-current='location'] .toc-num { color: var(--red); }
+
+  /* Reading column */
+
+  .prose {
+    font-family: var(--face-math);
+    max-width: 38rem;
+  }
+
+  .prose section { scroll-margin-top: 2rem; }
+  .prose section + section { margin-top: clamp(3.5rem, 7vw, 4.5rem); }
+
+  .prose h2 {
+    font-family: var(--face-text);
+    font-weight: 400;
+    font-size: clamp(1.625rem, 2.3vw, 2rem);
+    line-height: 1.2;
+    margin-bottom: 1.25rem;
+    text-wrap: balance;
+  }
+
+  .num {
+    display: inline-block;
+    min-width: 1.5em;
+    color: var(--red);
+    font-variant-numeric: lining-nums;
+  }
+
+  .prose p,
+  .prose ol { margin-top: 1rem; }
+  .prose h2 + p { margin-top: 0; }
+
+  .prose p { text-wrap: pretty; hanging-punctuation: first; }
+
+  var { font-style: italic; }
+  sub, sup { font-size: 0.72em; line-height: 0; }
+  dfn { font-style: italic; }
+
+  .prose a {
+    text-decoration-color: var(--blue);
+  }
+  .prose a:hover { color: var(--blue); }
+
+  /* Definitions, theorems and examples run in from a tracked head; statements are set in italic. */
+  .prose .env { margin-top: 1.5rem; }
+
+  .env-head {
+    margin-right: 0.45em;
+    font-family: var(--face-text);
+    font-size: 0.8125rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+
+  .stmt,
+  .stmt-cont,
+  .stmt-list { font-style: italic; }
+
+  .prose .display {
+    margin-block: 1.25rem;
+    text-align: center;
+    font-size: 1.125rem;
+  }
+
+  .axioms {
+    counter-reset: axiom;
+    padding-left: 2.25rem;
+  }
+
+  .axioms li {
+    counter-increment: axiom;
+    position: relative;
+    margin-top: 0.4rem;
+  }
+
+  .axioms li::before {
+    content: '(' counter(axiom, lower-roman) ')';
+    position: absolute;
+    left: -2.25rem;
+    font-style: normal;
+    color: var(--ink-3);
+  }
+
+  .axioms em { font-style: italic; color: var(--ink-2); }
+
+  .proof {
+    margin-top: 1rem;
+    color: var(--ink-2);
+  }
+
+  .proof-head {
+    margin-right: 0.35em;
+    font-style: italic;
+    color: var(--ink);
+  }
+
+  /* The end of a proof: a small square of ink set at the right of its last line. */
+  .proof p:last-child::after {
+    content: '';
+    float: right;
+    width: 0.5em;
+    height: 0.5em;
+    margin: 0.55em 0 0 1em;
+    background: var(--ink);
+  }
+
+  .problems {
+    counter-reset: problem;
+  }
+
+  .problems li {
+    counter-increment: problem;
+    position: relative;
+    padding-left: 2.75rem;
+    margin-top: 1rem;
+  }
+
+  .problems li::before {
+    content: var(--section) '.' counter(problem);
+    position: absolute;
+    left: 0;
+    font-size: 0.9375rem;
+    font-variant-numeric: lining-nums;
+    color: var(--ink-3);
+  }
+
+  @media (min-width: 960px) {
+    /* Two columns. The left fifth holds the figure, its caption, then the contents rail;
+       the rest holds the title and the text on one shared edge. */
+    .notes {
+      grid-template-columns: minmax(13rem, 1fr) minmax(0, 4fr);
+      grid-template-rows: auto auto 1fr;
+      grid-template-areas:
+        'figure head'
+        'figure body'
+        'contents body';
+      column-gap: clamp(2rem, 3vw, 3rem);
+      padding-top: 0.25rem;
+    }
+
+    .opening-figure { padding-top: 2.5rem; }
+
+    /* The column is too narrow for the caption's margin numeral: FIG. 1 sits above its text. */
+    .opening-figure :global(.caption) {
+      grid-template-columns: minmax(0, 1fr);
+      row-gap: 0.5rem;
+      font-size: 0.9375rem;
+    }
+
+    .opening-figure :global(.caption-text),
+    .opening-figure :global(.readout) { grid-column: 1; }
+
+    .title-block {
+      align-self: start;
+      margin-top: 2.5rem;
+    }
+
+    .title-block,
+    .prose { padding-left: var(--margin-col); }
+
+    .prose { max-width: calc(var(--margin-col) + 36em); }
+
+    .contents,
+    .prose { margin-top: clamp(3rem, 7svh, 4.5rem); }
+
+    .contents {
+      align-self: start;
+      position: sticky;
+      top: 2rem;
+    }
+
+    /* Section numerals and fact labels hang in the margin column, as the figure numeral does. */
+    .num {
+      min-width: 0;
+      width: var(--margin-col);
+      margin-left: calc(-1 * var(--margin-col));
+    }
+
+    .facts {
+      grid-template-columns: var(--margin-col) minmax(0, 1fr);
+      margin-left: calc(-1 * var(--margin-col));
+    }
+  }
+</style>
