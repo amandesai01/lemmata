@@ -1,0 +1,52 @@
+name: Deploy
+
+# Production deploys happen only from GitHub releases. Vercel's own Git integration
+# is switched off in vercel.json, so pushes and pull requests never deploy.
+on:
+  release:
+    types: [published]
+
+# A newer release supersedes a deploy still in flight.
+concurrency:
+  group: vercel-production
+  cancel-in-progress: true
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      # Prereleases, and releases published without being marked latest, are skipped.
+      - name: Check this is the latest release
+        id: latest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          latest=$(gh api "repos/${{ github.repository }}/releases/latest" --jq .tag_name)
+          if [ "$latest" = "${{ github.event.release.tag_name }}" ]; then
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::${{ github.event.release.tag_name }} is not the latest release ($latest); skipping deploy."
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.latest.outputs.deploy == 'true'
+
+      - uses: actions/setup-node@v4
+        if: steps.latest.outputs.deploy == 'true'
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Deploy to Vercel
+        if: steps.latest.outputs.deploy == 'true'
+        run: |
+          npm ci
+          npx vercel@latest pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+          npx vercel@latest build --prod --token=${{ secrets.VERCEL_TOKEN }}
+          npx vercel@latest deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}

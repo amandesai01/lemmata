@@ -3,3 +3,6 @@ dist/
 .astro/
 .DS_Store
 .impeccable/config.local.json
+.vercel/
+.vercel
+.env*
