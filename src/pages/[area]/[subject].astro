@@ -5,6 +5,8 @@ import SiteHeader from '../../components/SiteHeader.astro';
 import Colophon from '../../components/Colophon.astro';
 import { components } from '../../components/notes';
 import { figures } from '../../components/notes/figures';
+import { listStatements } from '../../components/notes/statements';
+import StatementPeek from '../../components/notes/StatementPeek.astro';
 import { catalog } from '../../data/catalog';
 import '../../styles/notes.css';
 
@@ -23,6 +25,9 @@ const { Content, headings } = await render(note);
 const sections = headings.filter((h) => h.depth === 2);
 const areaName = catalog.find((s) => s.id === area)!.name;
 const Figure = figures[figure];
+const statements = listStatements(note.body ?? '', note.id);
+// Where the section number changes (1.4 → 2.1), the list leaves a little space.
+const opensSection = (i: number) => i > 0 && statements[i].n.split('.')[0] !== statements[i - 1].n.split('.')[0];
 ---
 
 <Base title={`${title} · Lemmata`} description={description}>
@@ -59,31 +64,69 @@ const Figure = figures[figure];
     <article class="prose">
       <Content components={components} />
     </article>
+
+    {statements.length > 0 && (
+      <nav class="statements" aria-labelledby="statements-heading">
+        <h2 id="statements-heading">Statements</h2>
+        <ol>
+          {statements.map((s, i) => (
+            <li class:list={{ 'opens-section': opensSection(i) }}>
+              <a href={`#${s.id}`} data-statement={s.id}>
+                <span class="st-label">{s.kind} {s.n}</span>
+                <span class="st-title" set:html={s.title} />
+              </a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+    )}
   </main>
+
+  <StatementPeek />
 
   <Colophon />
 </Base>
 
 <script>
-  // Mark the section being read in the contents: the last section whose heading has passed the top
-  // fifth of the window, or the first while its heading is still in the upper part of the window.
-  const links = new Map(
-    [...document.querySelectorAll<HTMLAnchorElement>('.contents a[data-section]')].map((a) => [a.dataset.section!, a]),
-  );
-  const headings = [...document.querySelectorAll<HTMLElement>('.prose h2[id]')];
+  // Mark where the reader is: in the contents, the last section whose heading has passed the top
+  // fifth of the window, or the first while its heading is still in the upper part of the window;
+  // in the statements, the last statement to pass the same line, kept in view in its list.
+  const linksBy = (selector: string, key: string) =>
+    new Map([...document.querySelectorAll<HTMLAnchorElement>(selector)].map((a) => [a.dataset[key]!, a]));
+  const sectionLinks = linksBy('.contents a[data-section]', 'section');
+  const statementLinks = linksBy('.statements a[data-statement]', 'statement');
+  const statementList = document.querySelector<HTMLElement>('.statements');
 
-  const mark = (id: string | null) => {
+  const headings = [...document.querySelectorAll<HTMLElement>('.prose h2[id]')];
+  const statements = [...statementLinks.keys()].map((id) => document.getElementById(id)!).filter(Boolean);
+
+  const mark = (links: Map<string, HTMLAnchorElement>, id: string | null) => {
     links.forEach((a, key) => {
       if (key === id) a.setAttribute('aria-current', 'location');
       else a.removeAttribute('aria-current');
     });
   };
 
+  const lastPassed = (els: HTMLElement[], line: number) => els.filter((el) => el.getBoundingClientRect().top <= line).at(-1);
+
   const update = () => {
     const vh = window.innerHeight;
-    const passed = headings.filter((h) => h.getBoundingClientRect().top <= vh * 0.15);
-    const current = passed.at(-1) ?? (headings[0]?.getBoundingClientRect().top < vh * 0.4 ? headings[0] : null);
-    mark(current?.id ?? null);
+    const section = lastPassed(headings, vh * 0.15) ?? (headings[0]?.getBoundingClientRect().top < vh * 0.4 ? headings[0] : null);
+    mark(sectionLinks, section?.id ?? null);
+
+    const statement = lastPassed(statements, vh * 0.15);
+    mark(statementLinks, statement?.id ?? null);
+
+    // Scroll the list itself, never the page, so the marked statement stays in sight.
+    const link = statement && statementLinks.get(statement.id);
+    if (link && statementList && statementList.scrollHeight > statementList.clientHeight) {
+      const top = link.offsetTop;
+      const bottom = top + link.offsetHeight;
+      const margin = statementList.clientHeight * 0.25;
+      if (top < statementList.scrollTop + margin) statementList.scrollTop = top - margin;
+      else if (bottom > statementList.scrollTop + statementList.clientHeight - margin)
+        statementList.scrollTop = bottom - statementList.clientHeight + margin;
+    }
   };
 
   if (headings.length) {
@@ -116,6 +159,8 @@ const Figure = figures[figure];
   .title-block { grid-area: head; margin-top: clamp(2.5rem, 7vw, 3.5rem); }
   .contents { grid-area: contents; margin-top: 3rem; }
   .prose { grid-area: body; margin-top: clamp(3rem, 7vw, 4rem); }
+  /* Only where there is room for a third column. */
+  .statements { grid-area: index; display: none; }
 
   /* Title block */
 
@@ -186,9 +231,56 @@ const Figure = figures[figure];
   .contents a:hover { color: var(--red); }
   .contents a:hover span:last-child { text-decoration: underline; text-decoration-color: var(--red); }
 
-  /* The section being read: full ink, its numeral in red. */
-  .contents a[aria-current='location'] { color: var(--ink); }
+  /* The section being read: numeral and title in red. */
+  .contents a[aria-current='location'],
   .contents a[aria-current='location'] .toc-num { color: var(--red); }
+
+  /* Statements: every definition, result and example, each opening a quick look. */
+
+  .statements h2 {
+    font-weight: 400;
+    font-size: 0.8125rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+
+  .statements li.opens-section { margin-top: 0.75rem; }
+
+  .statements a {
+    display: block;
+    padding-block: 0.3rem;
+    line-height: 1.35;
+    color: var(--ink-2);
+    text-decoration: none;
+  }
+
+  .st-label {
+    display: block;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  .st-title {
+    display: block;
+    font-family: var(--face-math);
+    font-size: 0.9375rem;
+    text-wrap: pretty;
+  }
+
+  .st-title :global(em),
+  .st-title :global(dfn) { font-style: italic; }
+  .st-title :global(sub),
+  .st-title :global(sup) { font-size: 0.72em; line-height: 0; }
+
+  .statements a:hover .st-label,
+  .statements a:hover .st-title { color: var(--red); }
+
+  /* The statement being read: full ink, its label in red. */
+  .statements a[aria-current='location'] .st-title { color: var(--ink); }
+  .statements a[aria-current='location'] .st-label { color: var(--red); }
 
   @media (min-width: 960px) {
     /* Two columns. The left fifth holds the figure, its caption, then the contents rail;
@@ -240,5 +332,31 @@ const Figure = figures[figure];
       grid-template-columns: var(--margin-col) minmax(0, 1fr);
       margin-left: calc(-1 * var(--margin-col));
     }
+  }
+
+  @media (min-width: 1280px) {
+    /* A third column, as wide as the figure rail, holds the statements. The rail keeps its fifth. */
+    .notes {
+      grid-template-columns: minmax(13rem, 1fr) minmax(0, 3fr) minmax(13rem, 1fr);
+      grid-template-areas:
+        'figure head index'
+        'figure body index'
+        'contents body index';
+    }
+
+    .statements {
+      display: block;
+      align-self: start;
+      position: sticky;
+      top: 2rem;
+      max-height: calc(100svh - 4rem);
+      margin-top: 2.5rem;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      /* Scrolls by wheel and follows the reader, without a bar of its own. */
+      scrollbar-width: none;
+    }
+
+    .statements::-webkit-scrollbar { display: none; }
   }
 </style>
