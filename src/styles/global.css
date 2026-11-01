@@ -11,10 +11,10 @@
   --yellow: #EDB21B;
   --blue: #1C3F94;
 
-  --face-text: "Libre Caslon Text", "Iowan Old Style", Georgia, serif;
-  --face-display: "Libre Caslon Display", "Libre Caslon Text", Georgia, serif;
-  /* Caslon has no mathematical symbols; STIX supplies them glyph by glyph. */
-  --face-math: "Libre Caslon Text", "STIX Two Text", "Cambria Math", "Iowan Old Style", Georgia, serif;
+  --face-text: "STIX Two Text", Georgia, serif;
+  --face-display: "Libre Caslon Display", "STIX Two Text", Georgia, serif;
+  /* STIX Two Text has few mathematical symbols; STIX Two Math supplies them glyph by glyph. */
+  --face-math: "STIX Two Text", "STIX Two Math", "Cambria Math", Georgia, serif;
 
   --gutter: clamp(1rem, 4.4vw, 4rem);
   --margin-col: 4rem;   /* every numeral hangs in this column */
